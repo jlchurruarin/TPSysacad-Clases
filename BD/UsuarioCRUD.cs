@@ -43,21 +43,9 @@ namespace BibliotecaClases.BD
         {
             ConfigurarParametros();
 
-            List<string> columnas = new List<string>
-            {
-                "UsuarioId",
-                "Legajo",
-                "Nombre",
-                "Apellido",
-                "CorreoElectronico",
-                "Contrasenia",
-                "CambioObligatorio",
-                "DNI",
-                "NumeroDeTelefono",
-                "Direccion",
-            };
+            string[] columnasBD = ObtenerListaColumnasBD();
 
-            return base.Add(columnas);
+            return base.Add(columnasBD);
         }
 
         public int Delete()

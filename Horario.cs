@@ -4,57 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BibliotecaClases
+namespace BibliotecaClases.BD
 {
-    public class Horario
+    public partial class HorarioCurso
     {
-        private Dia _dia;
-        private DateTime _hora;
-        private float _cargaHoraria;
-
-        public Dia Dia
-        {
-            get { return _dia; }
-            set { _dia = value; }
-        }
-
-        public DateTime Hora 
-        {
-            get { return _hora; }
-            set { _hora = value; }
-        }
-
-        public float CargaHoraria
-        {
-            get { return _cargaHoraria; }
-            set { _cargaHoraria = value; }
-        }
 
         public string ObtenerHoraInicio()
         {
-            return TimeOnly.FromDateTime(_hora).ToString("HH:mm");
+            return TimeOnly.FromDateTime(HoraInicio).ToString("HH:mm");
         }
 
         public string ObtenerHoraFin()
         {
-            return _hora.AddHours(CargaHoraria).ToString("HH:mm");
+            return TimeOnly.FromDateTime(HoraFin).ToString("HH:mm");
         }
 
-        public Horario()
-        {
-            _hora = new DateTime();
-            _dia = Dia.NoDefinido;
-        }
+        public HorarioCurso(Curso curso) : this(curso.Id, Dia.NoDefinido, new DateTime(0), new DateTime(0)) { }
 
-        public Horario(Dia dia, TimeOnly hora)
-        {
-            _dia = dia;
-            _hora = new DateTime(0, 0, 0, hora.Hour, hora.Minute, hora.Second);
+        public HorarioCurso(Curso curso, Dia dia, TimeOnly horaInicio, TimeOnly horaFin) : this(curso) 
+        { 
+            Dia = dia;
+            HoraInicio = new DateTime(1753, 1, 1, horaInicio.Hour, horaInicio.Minute, horaInicio.Second);
+            HoraFin = new DateTime(1753, 1, 1, horaFin.Hour, horaFin.Minute, horaFin.Second);
         }
 
         public override string ToString()
         {
-            return $"{Enum.GetName(typeof(Dia), _dia)} - {ObtenerHoraInicio()} a {ObtenerHoraFin()}";
+            return $"{Enum.GetName(typeof(Dia), Dia)} - {ObtenerHoraInicio()} a {ObtenerHoraFin()}";
         }
     }
 }

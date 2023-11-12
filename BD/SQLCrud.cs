@@ -41,7 +41,7 @@ namespace BibliotecaClases.BD
             return ExecuteReader(query, mapeo);
         }
 
-        public int Add(List<string> campos)
+        public int Add(string[] campos)
         {
             var valores = string.Join(",@", campos).Insert(0, "@");
 

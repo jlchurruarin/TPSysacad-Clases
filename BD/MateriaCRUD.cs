@@ -27,21 +27,9 @@ namespace BibliotecaClases.BD
         public int Add()
         {
 
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@MateriaID", SqlDbType.VarChar);
-            _comando.Parameters["@MateriaID"].Value = Id;
-            _comando.Parameters.Add("@Nombre", SqlDbType.VarChar);
-            _comando.Parameters["@Nombre"].Value = Nombre;
-            _comando.Parameters.Add("@Descripcion", SqlDbType.VarChar);
-            _comando.Parameters["@Descripcion"].Value = Descripcion;
+            ConfigurarParametros();
 
-
-            List<string> columnas = new List<string>
-            {
-                "MateriaID",
-                "Nombre",
-                "Descripcion"
-            };
+            string[] columnas = ObtenerListaColumnasBD();
 
             return base.Add(columnas);
         }

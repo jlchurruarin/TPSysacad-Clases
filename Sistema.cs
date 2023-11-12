@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using BibliotecaClases.BD;
 
 namespace BibliotecaClases
 {
@@ -52,6 +53,7 @@ namespace BibliotecaClases
             return true;
         }
 
+        /*
         public static List<string> GenerarCalendario(List<Curso> listaCursos, Estudiante estudiante)
         {
             List<String> calendarioCursos = new List<string>();
@@ -69,6 +71,7 @@ namespace BibliotecaClases
 
             return calendarioCursos;
         }
+        */
 
         public static string EncriptarTexto(string texto)
         {

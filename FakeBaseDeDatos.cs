@@ -142,13 +142,15 @@ namespace BibliotecaClases
             return null;
         }
 
+        
         public List<Curso> BuscarCursosInscriptos(Estudiante estudiante)
         {
             List<Curso> listaCursosFiltrados = new List<Curso>();
 
             foreach (Curso curso in ListaCursos)
             {
-                List<Inscripcion> listaInscripcion = curso.ListaDeInscripciones.Where(inscripcion => inscripcion.IdEstudiante == estudiante.Id).ToList();
+                //List<Inscripcion> listaInscripcion = curso.ListaDeInscripciones.Where(inscripcion => inscripcion.IdEstudiante == estudiante.Id).ToList();
+                List<Inscripcion> listaInscripcion = new List<Inscripcion> { };
                 if (listaInscripcion.Count > 0)
                 {
                     listaCursosFiltrados.Add(curso);
@@ -159,7 +161,8 @@ namespace BibliotecaClases
 
         public List<Curso> BuscarCursos(Profesor profesor)
         {
-            List<Curso> ListaCursosFiltrados = _listaCursos.Where(cursoInscripto => cursoInscripto.IdProfesor == profesor.Id).ToList();
+            //List<Curso> ListaCursosFiltrados = _listaCursos.Where(cursoInscripto => cursoInscripto.IdProfesor == profesor.Id).ToList();
+            List<Curso> ListaCursosFiltrados = new List<Curso> { };
             return ListaCursosFiltrados;
         }
 
@@ -170,17 +173,17 @@ namespace BibliotecaClases
 
             foreach (Curso curso in _listaCursos)
             {
-                Materia? materiaDelCurso = BuscarMateriaPorID(curso.IdMateria);
+                Materia? materiaDelCurso = BuscarMateriaPorID(curso.Id);
                 bool cumpleRequisitos = true;
                 if (materiaDelCurso is not null) { 
-                    if (cursosEstudiante.Any(ce => ce.IdMateria == materiaDelCurso.Id)) {
+                    if (cursosEstudiante.Any(ce => ce.Id == materiaDelCurso.Id)) {
                         cumpleRequisitos = false;
                     }
                     else
                     {
                         foreach (string materiaRequerida in materiaDelCurso.ListaIdMateriasRequeridas)
                         {
-                            if (cursosEstudiante.Any(ce => ce.IdMateria == materiaRequerida) == false) {
+                            if (cursosEstudiante.Any(ce => ce.Id == materiaRequerida) == false) {
                                 cumpleRequisitos = false;
                             }
                         }
@@ -327,7 +330,7 @@ namespace BibliotecaClases
                 return false;
             }
         }
-
+        
     }
 
 
