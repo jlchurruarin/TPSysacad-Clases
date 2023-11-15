@@ -29,7 +29,7 @@ namespace BibliotecaClases
             catch
             {
                 FakeBaseDeDatos baseDeDatos = new FakeBaseDeDatos();
-                Administrador administrador = new Administrador("Admin", "Admin", "Admin@admin.com", "1234");
+                Administrador administrador = new Administrador(1234, "Admin", "Admin", "Admin@admin.com", "1234", 1234);
                 if (baseDeDatos + administrador)
                 {
                     return baseDeDatos;

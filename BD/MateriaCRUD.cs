@@ -24,57 +24,73 @@ namespace BibliotecaClases.BD
             Descripcion = descripcion;
         }
 
-        public int Add()
+
+        protected override SqlDbType GetSqlDbType(string key)
         {
+            SqlDbType retorno;
 
-            ConfigurarParametros();
+            if (key == "MateriaID") retorno = SqlDbType.VarChar;
+            else if (key == "Nombre") retorno = SqlDbType.VarChar;
+            else if (key == "Descripcion") retorno = SqlDbType.VarChar;
+            else retorno = SqlDbType.Variant;
 
-            string[] columnas = ObtenerListaColumnasBD();
+            return retorno;
+        }
 
-            return base.Add(columnas);
+        public new int Add()
+        {
+            AddSetValue("MateriaID", Id);
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Descripcion", Descripcion);
+            return base.Add();
         }
 
 
-        public int Delete()
+        public new int Delete()
         {
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "MateriaID", Id }
-            };
+            AddWhereCondition("MateriaID", Id);
+            return base.Delete();
+        }
 
-            return base.Delete(camposValor);
+        public new int Update()
+        {
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Descripcion", Descripcion);
+
+            AddWhereCondition("MateriaID", Id);
+
+            return base.Update();
         }
 
         public static List<Materia> GetAll()
         {
             Materia mat = new Materia();
-            return mat.InternalGetAll(ObtenerListaColumnasBD());
+            return mat.InternalGetAll();
         }
 
-        private List<Materia> InternalGetAll(string[] columnas)
+        private List<Materia> InternalGetAll()
         {
-            return base.GetAll(Map, columnas);
+            AddColums(ObtenerListaColumnasBD());
+
+            return base.GetAll(Map);
         }
 
-        public static List<Materia> SearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        public static List<Materia> SearchWhere(Dictionary<string, object> campoValores)
         {
             Materia mat = new Materia();
-            return mat.InternalSearchWhere(columnas, campoValores);
+            return mat.InternalSearchWhere(campoValores);
         }
 
-        private List<Materia> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        private List<Materia> InternalSearchWhere(Dictionary<string, object> campoValores)
         {
-            return base.SearchWhere(Map, columnas, campoValores);
-        }
+            AddColums(ObtenerListaColumnasBD());
 
-        public int Update()
-        {
-            string[] columnasBD = ObtenerListaColumnasBD();
-            ConfigurarParametros();
+            foreach (var item in campoValores)
+            {
+                AddWhereCondition(item.Key, item.Value);
+            }
 
-            string nombreCampoID = "MateriaID";
-            string valorCampoId = Id;
-            return base.Update(columnasBD, nombreCampoID, valorCampoId);
+            return base.SearchWhere(Map);
         }
 
         public Materia Map(IDataRecord reader)
@@ -97,18 +113,6 @@ namespace BibliotecaClases.BD
                 "Descripcion"
             ];
         }
-
-        private void ConfigurarParametros()
-        {
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@MateriaID", SqlDbType.VarChar);
-            _comando.Parameters["@MateriaID"].Value = Id;
-            _comando.Parameters.Add("@Nombre", SqlDbType.VarChar);
-            _comando.Parameters["@Nombre"].Value = Nombre;
-            _comando.Parameters.Add("@Descripcion", SqlDbType.VarChar);
-            _comando.Parameters["@Descripcion"].Value = Descripcion;
-        }
-
     }
 }
 

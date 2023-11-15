@@ -2,89 +2,242 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices.ObjectiveC;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BibliotecaClases.BD
 {
-    public class SQLCrud<T> : SQLDB<T>
+    [Serializable]
+    internal class QueryNotWhere : Exception
+    {
+        public QueryNotWhere()
+        {
+        }
+
+        public QueryNotWhere(string? message) : base(message)
+        {
+        }
+
+        public QueryNotWhere(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected QueryNotWhere(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+    [Serializable]
+    internal class QueryNotSetValues : Exception
+    {
+        public QueryNotSetValues()
+        {
+        }
+
+        public QueryNotSetValues(string? message) : base(message)
+        {
+        }
+
+        public QueryNotSetValues(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected QueryNotSetValues(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+
+    public abstract class SQLCrud<T> : SQLDB<T> where T : class
     {
         private readonly string _tableName;
+        private Dictionary<string, object> _where = new Dictionary<string, object>();
+        private Dictionary<string, object> _set = new Dictionary<string, object>();
+        private List<string> _columns = new List<string>();
+        private List<string> _joins = new List<string>();
+
 
         public SQLCrud(string tableName)
         {
             _tableName = tableName;
         }
 
-        public List<T> GetAll(Func<IDataRecord, T> mapeo, string[] columnas)
+        public List<T> GetAll(Func<IDataRecord, T> mapeo)
         {
-            var query = PrepareQuery(columnas);
+            var query = PrepareSelectQuery();
             _comando.CommandText = query;
-            _comando.Parameters.Clear();
 
-            return ExecuteReader(query, mapeo);
+            List<T> resultado = ExecuteReader(query, mapeo);
+            ClearQuery();
+            return resultado;
         }
 
-        public List<T> SearchWhere(Func<IDataRecord, T> mapeo, string[] columnas, Dictionary<string, object> campoValores)
+        public List<T> SearchWhere(Func<IDataRecord, T> mapeo)
         {
-            var select = PrepareQuery(columnas);
-            var where = string.Join(" AND ", campoValores.Select(x => $"{x.Key} = @{x.Key}").ToArray());
-            var query = $"{select} WHERE {where}";
+            var query = PrepareSelectQuery();
             _comando.CommandText = query;
-            _comando.Parameters.Clear();
 
-            foreach ( var item in campoValores )
+            List<T> result = ExecuteReader(query, mapeo);
+            ClearQuery();
+            return result;
+        }
+
+        public int Add()
+        {
+            _comando.CommandText = PrepareInsertQuery();
+            int result = ExecuteNonQuery();
+            ClearQuery();
+            return result;
+        }
+
+        public int Delete()
+        {
+            _comando.CommandText = PrepareDeleteQuery();
+            int result = ExecuteNonQuery();
+            ClearQuery();
+            return result;
+        }
+
+        public int Update()
+        {
+            _comando.CommandText = PrepareUpdateQuery();
+            int result = ExecuteNonQuery();
+            ClearQuery();
+            return result;
+        }
+
+        private protected string PrepareSelectQuery()
+        {
+            StringBuilder query = new StringBuilder();
+
+            var columnas = string.Join(",", _columns);
+
+            query.AppendFormat("SELECT {0} FROM {1}", columnas, _tableName);
+
+            if (_joins.Count > 0) 
             {
-                _comando.Parameters.AddWithValue($"@{item.Key}", item.Value);
+                foreach (var join in _joins)
+                {
+                    query.AppendLine(join);
+                }
             }
-            return ExecuteReader(query, mapeo);
+
+            if (_where.Count > 0)
+            {
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @{x.Key}").ToArray());
+                query.AppendLine($"WHERE {where}");
+            }
+
+            return query.ToString();
         }
 
-        public int Add(string[] campos)
+        private protected string PrepareInsertQuery()
         {
-            var valores = string.Join(",@", campos).Insert(0, "@");
+            if (_set.Count == 0) throw new QueryNotSetValues("No se han configurado valores a agregar");
 
-            _comando.CommandText = $"INSERT INTO {_tableName} VALUES ({valores})";
+            StringBuilder query = new StringBuilder();
 
-            return ExecuteNonQuery();
+            var valores = string.Join(",@s", _set.Keys).Insert(0, "@s");
+
+            query.AppendFormat("INSERT INTO {0} VALUES ({1})", _tableName, valores);
+
+            return query.ToString();
         }
 
-        public int Delete(Dictionary<string, object> campoValores)
+        private protected string PrepareUpdateQuery()
         {
-            var where = string.Join(" AND ", campoValores.Select(x => $"{x.Key} = @{x.Key}").ToArray());
+            if (_set.Count == 0) throw new QueryNotSetValues("No se han configurado valores a modifucar");
+            StringBuilder query = new StringBuilder();
             
-            _comando.CommandText = $"DELETE FROM {_tableName} WHERE {where}";
-            _comando.Parameters.Clear();
+            var set = string.Join(", ", _set.Select(x => $"{x.Key} = @s{x.Key}").ToArray());
 
-            foreach (var item in campoValores)
+            query.AppendFormat("UPDATE {0} SET {1}", _tableName, set);
+
+            if (_where != null)
             {
-                _comando.Parameters.AddWithValue($"@{item.Key}", item.Value);
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Key}").ToArray());
+                query.Append($" WHERE {where}");
             }
 
-            return ExecuteNonQuery();
+            return query.ToString();
         }
 
-        public int Update(string[] columnasBD, string nombreCampoId, string valorCampoId)
+        private protected string PrepareDeleteQuery()
         {
-            var valores = string.Join(",@", columnasBD).Insert(0, "@");
-            _comando.CommandText = $"INSERT INTO {_tableName} VALUES ({valores}) WHERE {nombreCampoId} == @id";
+            if (_where == null) throw new QueryNotWhere("No se han agregado clausulas where");
+
+            StringBuilder query = new StringBuilder();
+
+            var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Key}").ToArray());
+
+            query.AppendFormat("DELETE FROM {0} WHERE {1}", _tableName, where);
+
+            return query.ToString();
+        }
+
+        protected void AddColums(string columna)
+        {
+            _columns.Add($"{_tableName}.{columna}");
+        }
+
+        protected void AddColums(string[] columnas)
+        {
+            foreach (var item in columnas)
+            {
+                AddColums(item);
+            }
+        }
+
+        protected void AddColums(string tableName, string columna)
+        {
+            AddColums($"{tableName}.{columna}");
+        }
+
+        protected void AddColums(string tableName, string[] columnas)
+        {
+            foreach (var item in columnas)
+            {
+                AddColums(tableName, item);
+            }
+        }
+
+        protected void AddWhereCondition(string columna, object valor)
+        {
+            _where.Add(columna, valor);
+            _comando.Parameters.Add($"@w{columna}", GetSqlDbType(columna));
+            _comando.Parameters[$"@w{columna}"].Value = valor;
+        }
+
+        protected void AddSetValue(string columna, object valor)
+        {
+            _set.Add(columna, valor);
+            _comando.Parameters.Add($"@s{columna}", GetSqlDbType(columna));
+            _comando.Parameters[$"@s{columna}"].Value = valor;
+        }
+
+        protected void AddJoin(string joinType, string externalTableName, string externalTableId, string tableId)
+        {
+            _joins.Add($"{joinType} {externalTableName} ON {externalTableId} = {tableId}");
+        }
+
+        private void ClearQuery()
+        {
+            _where.Clear();
+            _set.Clear();
             _comando.Parameters.Clear();
-
-            _comando.Parameters["@id"].Value = valorCampoId;
-
-            return ExecuteNonQuery();
+            _joins.Clear();
+            _columns.Clear();
         }
 
-
-        protected string PrepareQuery(string[] columnas)
+        protected virtual SqlDbType GetSqlDbType(string key)
         {
-            var cols = string.Join(",", columnas);
-
-            var query = $"SELECT {cols} FROM {_tableName}";
-
-            return query;
+            return SqlDbType.Variant;
         }
 
+        protected abstract string[] ObtenerListaColumnasBD();
     }
+
 }

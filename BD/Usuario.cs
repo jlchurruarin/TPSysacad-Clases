@@ -10,21 +10,33 @@ namespace BibliotecaClases.BD
     {
         private const int LONGITUDCONTRASENIA = 10;
 
-        internal Usuario() : this(0, string.Empty, string.Empty, string.Empty, string.Empty, false, 0,string.Empty, string.Empty)
+        protected Usuario() : this(string.Empty, TipoDeUsuario.Estudiante, 0, string.Empty, string.Empty, string.Empty, string.Empty, 0, false, string.Empty, string.Empty)
         {
         }
 
-        public Usuario(string nombre, string apellido, string correoElectronico) : this()
+        public Usuario(TipoDeUsuario tipoDeUsuario, int legajo, string nombre, string apellido,
+                        string correoElectronico, string contraseña, int dni) : this()
         {
+            Id = Sistema.GenerarUUID();
+            TipoDeUsuario = tipoDeUsuario;
+            Legajo = legajo;
             Nombre = nombre;
             Apellido = apellido;
             CorreoElectronico = correoElectronico;
+            Contraseña = Sistema.EncriptarTexto(contraseña);
+            Dni = dni;
+
         }
 
-        public Usuario(string nombre, string apellido, string correoElectronico, string contraseña) : this(nombre, apellido, correoElectronico)
+        public Usuario(TipoDeUsuario tipoDeUsuario, int legajo, string nombre, string apellido,
+                        string correoElectronico, string contraseña, int dni, 
+                        bool cambioDeContraseñaObligatorio, string numeroDeTelefojo, string direccion) : this(tipoDeUsuario, legajo, nombre, apellido, correoElectronico, contraseña, dni)
         {
-            Contraseña = Sistema.EncriptarTexto(contraseña);
+            CambioDeContraseñaObligatorio = cambioDeContraseñaObligatorio;
+            NumeroDeTelefono = numeroDeTelefojo;
+            Direccion = direccion;
         }
+
 
         public bool ValidarContraseña(string contraseñaIngresada)
         {

@@ -17,6 +17,8 @@ namespace BibliotecaClases.BD
         static List<T> GetAll() => throw new NotImplementedException();
         static List<T> SearchWhere() => throw new NotImplementedException();
 
+        static SqlDbType GetSqlDbType(string key) => throw new NotImplementedException();
+
         T Map(IDataRecord reader);
 
     }

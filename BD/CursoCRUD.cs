@@ -31,7 +31,7 @@ namespace BibliotecaClases.BD
 
             string[] columnasBD = ObtenerListaColumnasBD();
 
-            return base.Add(columnasBD);
+            return base.Add();
         }
 
         public int Delete()
@@ -41,7 +41,7 @@ namespace BibliotecaClases.BD
                 { "CursoID", Id }
             };
 
-            return base.Delete(camposValor);
+            return base.Delete();
         }
 
         public static List<Curso> GetAll()
@@ -58,7 +58,7 @@ namespace BibliotecaClases.BD
 
         private List<Curso> InternalGetAll(string[] columnas)
         {
-            return base.GetAll(Map, columnas);
+            return base.GetAll(Map);
         }
 
         public static List<Curso> SearchWhere(Dictionary<string, object> campoValores)
@@ -75,7 +75,7 @@ namespace BibliotecaClases.BD
 
         private List<Curso> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
         {
-            return base.SearchWhere(Map, columnas, campoValores);
+            return base.SearchWhere(Map);
         }
 
         public int Update()
@@ -83,9 +83,12 @@ namespace BibliotecaClases.BD
             string[] columnasBD = ObtenerListaColumnasBD();
             ConfigurarParametros();
 
-            string nombreCampoID = "CursoID";
-            string valorCampoId = Id;
-            return base.Update(columnasBD, nombreCampoID, valorCampoId);
+            Dictionary<string, object> camposValor = new Dictionary<string, object>
+            {
+                { "CursoID", Id }
+            };
+
+            return base.Update();
         }
 
         public List<Curso> GetIncriptos()

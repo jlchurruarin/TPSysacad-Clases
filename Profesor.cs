@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,32 +12,26 @@ namespace BibliotecaClases
     public class Profesor : Usuario
     {   
 
-        private int _cuit;
+        private int _legajo;
 
 
-        public int Cuit
+        public int Legajo
         {
-            set { _cuit = value; }
-            get { return _cuit; }
+            set { _legajo = value; }
+            get { return _legajo; }
         }
 
-        public Profesor() : base() 
-        { 
+        private Profesor() : base()
+        {
         }
 
-        public Profesor(string nombre, string apellido, int cuit, string correoElectronico) : base(nombre, apellido, correoElectronico)
+        public Profesor(int legajo, string nombre, string apellido, string correoElectronico, string contraseña, int dni) : base(TipoDeUsuario.Profesor, legajo, nombre, apellido, correoElectronico, contraseña, dni)
         {
-            _cuit = cuit;
-        }
-
-        public Profesor(string nombre, string apellido, int cuit, string correoElectronico, string contraseña) : this(nombre, apellido, cuit, correoElectronico)
-        {
-            Contraseña = contraseña;
         }
 
         public override string ToString()
         {
-            return $"{Apellido}, {Nombre} - {_cuit} - {CorreoElectronico}";
+            return $"{Apellido}, {Nombre} - {_legajo} - {CorreoElectronico}";
         }
 
         public void DarClases()

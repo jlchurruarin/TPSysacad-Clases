@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BibliotecaClases
 {
-    public enum MetodoDePago
+    public enum MetodoPago
     {
         Efectivo,
         Debito,

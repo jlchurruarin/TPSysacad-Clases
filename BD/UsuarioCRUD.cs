@@ -13,6 +13,7 @@ namespace BibliotecaClases.BD
 
 
         public string Id { get; set; }
+        public TipoDeUsuario TipoDeUsuario { get; set; }
         public int Legajo { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
@@ -23,11 +24,12 @@ namespace BibliotecaClases.BD
         public string NumeroDeTelefono { get; set; }
         public string Direccion { get; set; }
 
-        public Usuario(int legajo, string nombre, string apellido, 
-                        string correoElectronico, string contraseña, bool cambioDeContraseñaObligatorio, 
-                        int dni, string numeroDeTelefono, string direccion) : base("Usuarios")
+        protected Usuario(string id, TipoDeUsuario tipoDeUsuario, int legajo, string nombre, string apellido, 
+                        string correoElectronico, string contraseña, int dni, 
+                        bool cambioDeContraseñaObligatorio, string numeroDeTelefojo, string direccion) : base("Usuarios")
         {
-            Id = Sistema.GenerarUUID();
+            Id = id;
+            TipoDeUsuario = tipoDeUsuario;
             Legajo = legajo;
             Nombre = nombre;
             Apellido = apellido;
@@ -35,17 +37,20 @@ namespace BibliotecaClases.BD
             Contraseña = contraseña;
             CambioDeContraseñaObligatorio = cambioDeContraseñaObligatorio;
             Dni = dni;
-            NumeroDeTelefono = numeroDeTelefono;
+            NumeroDeTelefono = numeroDeTelefojo;
             Direccion = direccion;
         }
 
         public int Add()
         {
+
+            //Microsoft.Data.SqlClient.SqlException a validar
+
             ConfigurarParametros();
 
             string[] columnasBD = ObtenerListaColumnasBD();
 
-            return base.Add(columnasBD);
+            return base.Add();
         }
 
         public int Delete()
@@ -55,7 +60,7 @@ namespace BibliotecaClases.BD
                 { "UsuarioId", Id }
             };
 
-            return base.Delete(camposValor);
+            return base.Delete();
         }
 
         public static List<Usuario> GetAll()
@@ -72,7 +77,7 @@ namespace BibliotecaClases.BD
 
         private List<Usuario> InternalGetAll(string[] columnas)
         {
-            return base.GetAll(Map, columnas);
+            return base.GetAll(Map);
         }
 
         public static List<Usuario> SearchWhere(Dictionary<string, object> campoValores)
@@ -89,7 +94,7 @@ namespace BibliotecaClases.BD
 
         private List<Usuario> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
         {
-            return base.SearchWhere(Map, columnas, campoValores);
+            return base.SearchWhere(Map);
         }
 
         public int Update()
@@ -97,14 +102,18 @@ namespace BibliotecaClases.BD
             string[] columnasBD = ObtenerListaColumnasBD();
             ConfigurarParametros();
 
-            string nombreCampoID = "UsuarioId";
-            string valorCampoId = Id;
-            return base.Update(columnasBD, nombreCampoID, valorCampoId);
+            Dictionary<string, object> camposValor = new Dictionary<string, object>
+            {
+                { "UsuarioId", Id }
+            };
+
+            return base.Update();
         }
 
         public Usuario Map(IDataRecord reader)
         {
             var id = reader["UsuarioId"].ToString() ?? "";
+            var tipoUsuario = (TipoDeUsuario) reader.GetByte(reader.GetOrdinal("TipoUsuario"));
             var legajo = reader.GetInt32(reader.GetOrdinal("Legajo"));
             var nombre = reader["Nombre"].ToString() ?? "";
             var apellido = reader["Apellido"].ToString() ?? "";
@@ -115,8 +124,9 @@ namespace BibliotecaClases.BD
             var numeroDeTelefono = reader["NumeroDeTelefono"].ToString() ?? "";
             var direccion = reader["Direccion"].ToString() ?? "";
 
-            var usuario = new Usuario(legajo, nombre, apellido, correoElectronico, contraseña, cambioDeContraseñaObligatorio, dni, numeroDeTelefono, direccion);
-            usuario.Id = id;
+            var usuario = new Usuario(id, tipoUsuario, legajo, nombre, apellido, 
+                                correoElectronico, contraseña, dni,
+                                cambioDeContraseñaObligatorio, numeroDeTelefono, direccion);
 
             return usuario;
         }
@@ -126,6 +136,7 @@ namespace BibliotecaClases.BD
             return
             [
                 "UsuarioId",
+                "TipoUsuario",
                 "Legajo",
                 "Nombre",
                 "Apellido",
@@ -134,7 +145,7 @@ namespace BibliotecaClases.BD
                 "CambioObligatorio",
                 "DNI",
                 "NumeroDeTelefono",
-                "Direccion"
+                "Direccion",
             ];
         }
 
@@ -143,6 +154,8 @@ namespace BibliotecaClases.BD
             _comando.Parameters.Clear();
             _comando.Parameters.Add("@UsuarioId", SqlDbType.VarChar);
             _comando.Parameters["@UsuarioId"].Value = Id;
+            _comando.Parameters.Add("@TipoUsuario", SqlDbType.TinyInt);
+            _comando.Parameters["@TipoUsuario"].Value = (int) TipoDeUsuario;
             _comando.Parameters.Add("@Legajo", SqlDbType.Int);
             _comando.Parameters["@Legajo"].Value = Legajo;
             _comando.Parameters.Add("@Nombre", SqlDbType.VarChar);

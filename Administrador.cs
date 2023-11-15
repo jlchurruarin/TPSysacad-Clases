@@ -5,14 +5,20 @@ namespace BibliotecaClases
     public class Administrador : Usuario
     {
 
-        public Administrador() :base()
+        private Administrador() :base()
         { }
 
-        public Administrador(string nombre, string apellido, string correoElectronico) : base(nombre, apellido,correoElectronico)
-        { }
+        public Administrador(int legajo, string nombre, string apellido,
+                             string correoElectronico, string contraseña, int dni) : 
+                                base(TipoDeUsuario.Administrador, legajo, nombre, apellido, 
+                                correoElectronico, contraseña, dni) { }
 
-        public Administrador(string nombre, string apellido, string correoElectronico, string contraseña) : base(nombre, apellido,correoElectronico, contraseña)
-        { }
+        public Administrador(int legajo, string nombre, string apellido,
+                             string correoElectronico, string contraseña, int dni,
+                             bool cambioDeContraseñaObligatorio, string numeroDeTelefojo, string direccion) : 
+                                base(TipoDeUsuario.Administrador, legajo, nombre, apellido, 
+                                correoElectronico, contraseña, dni, cambioDeContraseñaObligatorio, 
+                                numeroDeTelefojo, direccion) { }
 
         public override string ToString()
         {

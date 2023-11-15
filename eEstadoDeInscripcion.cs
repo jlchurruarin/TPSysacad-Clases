@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace BibliotecaClases
 {
-    public enum EstadoPago
+    public enum EstadoDeInscripcion
     {
-        Pendiente, 
-        Pagado, 
-        Vencido
+        EnListaDeEspera,
+        Cursando,
+        Libre,
+        CursadaAprobada,
+        FinalAprobado,
     }
 }

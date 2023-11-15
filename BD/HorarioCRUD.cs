@@ -30,7 +30,7 @@ namespace BibliotecaClases.BD
 
             string[] columnasBD = ObtenerListaColumnasBD();
 
-            return base.Add(columnasBD);
+            return base.Add();
         }
 
         public int Delete()
@@ -42,7 +42,7 @@ namespace BibliotecaClases.BD
                 { "HoraInicio", HoraInicio }
             };
 
-            return base.Delete(camposValor);
+            return base.Delete();
         }
 
         public static List<HorarioCurso> GetAll()
@@ -53,7 +53,7 @@ namespace BibliotecaClases.BD
 
         private List<HorarioCurso> InternalGetAll(string[] columnas)
         {
-            return base.GetAll(Map, columnas);
+            return base.GetAll(Map);
         }
 
         public static List<HorarioCurso> SearchWhere(string[] columnas, Dictionary<string, object> campoValores)
@@ -64,12 +64,22 @@ namespace BibliotecaClases.BD
 
         private List<HorarioCurso> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
         {
-            return base.SearchWhere(Map, columnas, campoValores);
+            return base.SearchWhere(Map);
         }
 
         public int Update()
         {
-            throw new NotImplementedException();
+            string[] columnasBD = ObtenerListaColumnasBD();
+            ConfigurarParametros();
+
+            Dictionary<string, object> camposValor = new Dictionary<string, object>
+            {
+                { "CursoID", Id },
+                { "Dia", Dia },
+                { "HoraInicio", HoraInicio },
+            };
+
+            return base.Update();
         }
 
         public HorarioCurso Map(IDataRecord reader)
