@@ -24,62 +24,51 @@ namespace BibliotecaClases.BD
             HoraFin = new DateTime(1753 , 1, 1, horaFin.Hour, horaFin.Minute, horaFin.Second);
         }
 
-        public int Add()
+        public new int Add()
         {
-            ConfigurarParametros();
-
-            string[] columnasBD = ObtenerListaColumnasBD();
-
+            AddSetValue("CursoID", Id);
+            AddSetValue("Dia", (int) Dia);
+            AddSetValue("HoraInicio", HoraInicio);
+            AddSetValue("HoraFin", HoraFin);
             return base.Add();
         }
 
-        public int Delete()
+        public new int Delete()
         {
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "CursoID", Id },
-                { "Dia", Dia },
-                { "HoraInicio", HoraInicio }
-            };
+            AddWhereCondition("CursoID", Id);
+            AddWhereCondition("Dia", (int) Dia);
 
             return base.Delete();
+        }
+
+        public new int Update()
+        {
+            AddSetValue("HoraInicio", HoraInicio);
+            AddSetValue("HoraFin", HoraFin);
+
+            AddWhereCondition("CursoID", Id);
+            AddWhereCondition("Dia", Dia);
+
+            return base.Update();
         }
 
         public static List<HorarioCurso> GetAll()
         {
             HorarioCurso hc = new HorarioCurso();
-            return hc.InternalGetAll(ObtenerListaColumnasBD());
+            return hc.InternalGetAll(hc.Map);
         }
 
-        private List<HorarioCurso> InternalGetAll(string[] columnas)
-        {
-            return base.GetAll(Map);
-        }
-
-        public static List<HorarioCurso> SearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        public static List<HorarioCurso> SearchWhere(Dictionary<string, object> campoValores)
         {
             HorarioCurso hc = new HorarioCurso();
-            return hc.InternalSearchWhere(columnas, campoValores);
+            return hc.InternalSearchWhere(hc.Map, campoValores);
         }
 
-        private List<HorarioCurso> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        public static List<HorarioCurso> GetHorarioCursos(Curso curso)
         {
-            return base.SearchWhere(Map);
-        }
-
-        public int Update()
-        {
-            string[] columnasBD = ObtenerListaColumnasBD();
-            ConfigurarParametros();
-
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "CursoID", Id },
-                { "Dia", Dia },
-                { "HoraInicio", HoraInicio },
-            };
-
-            return base.Update();
+            Dictionary<string, object> search = new Dictionary<string, object>();
+            search.Add("CursoID", curso.Id);
+            return SearchWhere(search);
         }
 
         public HorarioCurso Map(IDataRecord reader)
@@ -94,20 +83,7 @@ namespace BibliotecaClases.BD
             return curso;
         }
 
-        private void ConfigurarParametros()
-        {
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@CursoID", SqlDbType.VarChar);
-            _comando.Parameters["@CursoID"].Value = Id;
-            _comando.Parameters.Add("@Dia", SqlDbType.TinyInt);
-            _comando.Parameters["@Dia"].Value = (int) Dia;
-            _comando.Parameters.Add("@HoraInicio", SqlDbType.DateTime2);
-            _comando.Parameters["@HoraInicio"].Value = HoraInicio;
-            _comando.Parameters.Add("@HoraFin", SqlDbType.DateTime2);
-            _comando.Parameters["@HoraFin"].Value = HoraFin;
-        }
-
-        private static string[] ObtenerListaColumnasBD()
+        protected override string[] ObtenerListaColumnasBD()
         {
             return
             [
@@ -116,6 +92,19 @@ namespace BibliotecaClases.BD
                 "HoraInicio",
                 "HoraFin"
             ];
+        }
+
+        protected override SqlDbType GetSqlDbType(string key)
+        {
+            SqlDbType retorno;
+
+            if (key == "CursoID") retorno = SqlDbType.VarChar;
+            else if (key == "Dia") retorno = SqlDbType.VarChar;
+            else if (key == "HoraInicio") retorno = SqlDbType.DateTime2;
+            else if (key == "HoraFin") retorno = SqlDbType.DateTime2;
+            else retorno = SqlDbType.Variant;
+
+            return retorno;
         }
     }
 }

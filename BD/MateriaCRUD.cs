@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Runtime.Remoting;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,19 +23,6 @@ namespace BibliotecaClases.BD
             Id = id;
             Nombre = nombre;
             Descripcion = descripcion;
-        }
-
-
-        protected override SqlDbType GetSqlDbType(string key)
-        {
-            SqlDbType retorno;
-
-            if (key == "MateriaID") retorno = SqlDbType.VarChar;
-            else if (key == "Nombre") retorno = SqlDbType.VarChar;
-            else if (key == "Descripcion") retorno = SqlDbType.VarChar;
-            else retorno = SqlDbType.Variant;
-
-            return retorno;
         }
 
         public new int Add()
@@ -56,41 +44,20 @@ namespace BibliotecaClases.BD
         {
             AddSetValue("Nombre", Nombre);
             AddSetValue("Descripcion", Descripcion);
-
             AddWhereCondition("MateriaID", Id);
-
             return base.Update();
         }
 
         public static List<Materia> GetAll()
         {
             Materia mat = new Materia();
-            return mat.InternalGetAll();
-        }
-
-        private List<Materia> InternalGetAll()
-        {
-            AddColums(ObtenerListaColumnasBD());
-
-            return base.GetAll(Map);
+            return mat.InternalGetAll(mat.Map);
         }
 
         public static List<Materia> SearchWhere(Dictionary<string, object> campoValores)
         {
             Materia mat = new Materia();
-            return mat.InternalSearchWhere(campoValores);
-        }
-
-        private List<Materia> InternalSearchWhere(Dictionary<string, object> campoValores)
-        {
-            AddColums(ObtenerListaColumnasBD());
-
-            foreach (var item in campoValores)
-            {
-                AddWhereCondition(item.Key, item.Value);
-            }
-
-            return base.SearchWhere(Map);
+            return mat.InternalSearchWhere(mat.Map, campoValores);
         }
 
         public Materia Map(IDataRecord reader)
@@ -104,7 +71,7 @@ namespace BibliotecaClases.BD
             return materia;
         }
 
-        private static string[] ObtenerListaColumnasBD()
+        protected override string[] ObtenerListaColumnasBD()
         {
             return 
             [ 
@@ -112,6 +79,18 @@ namespace BibliotecaClases.BD
                 "Nombre",
                 "Descripcion"
             ];
+        }
+
+        protected override SqlDbType GetSqlDbType(string key)
+        {
+            SqlDbType retorno;
+
+            if (key == "MateriaID") retorno = SqlDbType.VarChar;
+            else if (key == "Nombre") retorno = SqlDbType.VarChar;
+            else if (key == "Descripcion") retorno = SqlDbType.VarChar;
+            else retorno = SqlDbType.Variant;
+
+            return retorno;
         }
     }
 }

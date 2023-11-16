@@ -23,39 +23,41 @@ namespace BibliotecaClases.BD
             FechaInscripcion = fechaInscripcion;
         }
 
-        public int Add()
+        public new int Add()
         {
-            ConfigurarParametros();
-
-            string[] columnasBD = ObtenerListaColumnasBD();
-
+            AddSetValue("EstudianteID", EstudianteId);
+            AddSetValue("CursoID", CursoId);
+            AddSetValue("EstadoDeInscripcion", EstadoDeInscripcion);
+            AddSetValue("FechaInscripcion", FechaInscripcion);
             return base.Add();
         }
 
-        public int Delete()
+        public new int Delete()
         {
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "EstudianteID", EstudianteId },
-                { "CursoID", CursoId },
-            };
-
+            AddWhereCondition("EstudianteID", EstudianteId);
+            AddWhereCondition("CursoID", CursoId);
             return base.Delete();
         }
 
-        public int Update()
+        public new int Update()
         {
-            string[] columnasBD = ObtenerListaColumnasBD();
-            ConfigurarParametros();
-
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "EstudianteID", EstudianteId },
-                { "CursoID", CursoId },
-            };
-
+            AddWhereCondition("EstudianteID", EstudianteId);
+            AddWhereCondition("CursoID", CursoId);
             return base.Update();
         }
+
+        public static List<Inscripcion> GetAll()
+        {
+            Inscripcion inscripcion = new Inscripcion();
+            return inscripcion.InternalGetAll(inscripcion.Map);
+        }
+
+        public static List<Inscripcion> SearchWhere(Dictionary<string, object> campoValores)
+        {
+            Inscripcion inscripcion = new Inscripcion();
+            return inscripcion.InternalSearchWhere(inscripcion.Map, campoValores);
+        }
+
 
         public Inscripcion Map(IDataRecord reader)
         {
@@ -68,21 +70,7 @@ namespace BibliotecaClases.BD
             return inscripcion;
         }
 
-        private void ConfigurarParametros()
-        {
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@EstudianteID", SqlDbType.VarChar);
-            _comando.Parameters["@EstudianteID"].Value = EstudianteId;
-            _comando.Parameters.Add("@CursoID", SqlDbType.VarChar);
-            _comando.Parameters["@CursoID"].Value = CursoId;
-            _comando.Parameters.Add("@EstadoDeInscripcion", SqlDbType.TinyInt);
-            _comando.Parameters["@EstadoDeInscripcion"].Value = (int) EstadoDeInscripcion;
-            _comando.Parameters.Add("@FechaInscripcion", SqlDbType.DateTime);
-            _comando.Parameters["@FechaInscripcion"].Value = FechaInscripcion;
-
-        }
-
-        private static string[] ObtenerListaColumnasBD()
+        protected override string[] ObtenerListaColumnasBD()
         {
             return
             [
@@ -91,6 +79,18 @@ namespace BibliotecaClases.BD
                 "EstadoDeInscripcion",
                 "FechaInscripcion"
             ];
+        }
+        protected override SqlDbType GetSqlDbType(string key)
+        {
+            SqlDbType retorno;
+
+            if (key == "EstudianteID") retorno = SqlDbType.VarChar;
+            else if (key == "CursoID") retorno = SqlDbType.VarChar;
+            else if (key == "EstadoDeInscripcion") retorno = SqlDbType.TinyInt;
+            else if (key == "FechaInscripcion") retorno = SqlDbType.Date;
+            else retorno = SqlDbType.Variant;
+
+            return retorno;
         }
     }
 }

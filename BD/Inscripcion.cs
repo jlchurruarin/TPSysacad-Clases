@@ -10,7 +10,7 @@ namespace BibliotecaClases.BD
     public partial class Inscripcion
     {
 
-        public Inscripcion() : this(string.Empty, string.Empty, EstadoCursada.EnCurso, new DateTime())
+        private Inscripcion() : this(string.Empty, string.Empty, EstadoCursada.EnCurso, DateTime.Now)
         {
             
         }

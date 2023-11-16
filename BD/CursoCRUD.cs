@@ -9,6 +9,7 @@ namespace BibliotecaClases.BD
 {
     public partial class Curso : SQLCrud<Curso>, ICRUDOps<Curso>
     {
+
         public string Id { get; set; }
         public string MateriaId { get; set; }
         public string Nombre { get; set; }
@@ -25,87 +26,59 @@ namespace BibliotecaClases.BD
             CupoMaximo = cupoMaximo;
         }
 
-        public int Add()
+        public new int Add()
         {
-            ConfigurarParametros();
-
-            string[] columnasBD = ObtenerListaColumnasBD();
-
+            AddSetValue("CursoID", Id);
+            AddSetValue("MateriaID", MateriaId);
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Aula", Aula);
+            AddSetValue("CupoMaximo", CupoMaximo);
             return base.Add();
         }
 
-        public int Delete()
+        public new int Delete()
         {
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "CursoID", Id }
-            };
-
+            AddWhereCondition("CursoID", Id);
             return base.Delete();
+        }
+
+        public new int Update()
+        {
+            AddSetValue("MateriaID", MateriaId);
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Aula", Aula);
+            AddSetValue("CupoMaximo", CupoMaximo);
+
+            AddWhereCondition("CursoID", Id);
+            return base.Update();
         }
 
         public static List<Curso> GetAll()
         {
             Curso curso = new Curso();
-            return curso.InternalGetAll(ObtenerListaColumnasBD());
-        }
-
-        public static List<Curso> GetAll(string[] columnas)
-        {
-            Curso curso = new Curso();
-            return curso.InternalGetAll(columnas);
-        }
-
-        private List<Curso> InternalGetAll(string[] columnas)
-        {
-            return base.GetAll(Map);
+            return curso.InternalGetAll(curso.Map);
         }
 
         public static List<Curso> SearchWhere(Dictionary<string, object> campoValores)
         {
             Curso curso = new Curso();
-            return curso.InternalSearchWhere(ObtenerListaColumnasBD(), campoValores);
+            return curso.InternalSearchWhere(curso.Map, campoValores);
         }
 
-        public static List<Curso> SearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        public List<Usuario> GetIncriptos()
         {
-            Curso curso = new Curso();
-            return curso.InternalSearchWhere(columnas, campoValores);
-        }
-
-        private List<Curso> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
-        {
-            return base.SearchWhere(Map);
-        }
-
-        public int Update()
-        {
-            string[] columnasBD = ObtenerListaColumnasBD();
-            ConfigurarParametros();
-
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "CursoID", Id }
-            };
-
-            return base.Update();
-        }
-
-        public List<Curso> GetIncriptos()
-        {
-            return this.GetIncriptos(ObtenerListaColumnasBD());
-        }
-
-        public List<Curso> GetIncriptos(string[] columnas)
-        {
-            //TODO
-            return new List<Curso> { new Curso() };
+            return Usuario.GetUsuariosInscriptos(this);
         }
 
         public int GetCantidadIncriptos()
         {
-            //TODO
-            return 0;
+            List<Usuario> listaInscriptos = Usuario.GetUsuariosInscriptos(this);
+            return listaInscriptos.Count;
+        }
+
+        public List<HorarioCurso> GetAllHorarios()
+        {
+            return HorarioCurso.GetHorarioCursos(this);
         }
 
         public Curso Map(IDataRecord reader)
@@ -121,23 +94,7 @@ namespace BibliotecaClases.BD
             return curso;
         }
 
-        private void ConfigurarParametros()
-        {
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@CursoID", SqlDbType.VarChar);
-            _comando.Parameters["@CursoID"].Value = Id;
-            _comando.Parameters.Add("@MateriaID", SqlDbType.VarChar);
-            _comando.Parameters["@MateriaID"].Value = MateriaId;
-            _comando.Parameters.Add("@Nombre", SqlDbType.VarChar);
-            _comando.Parameters["@Nombre"].Value = Nombre;
-            _comando.Parameters.Add("@Aula", SqlDbType.VarChar);
-            _comando.Parameters["@Aula"].Value = Aula;
-            _comando.Parameters.Add("@CupoMaximo", SqlDbType.Int);
-            _comando.Parameters["@CupoMaximo"].Value = CupoMaximo;
-
-        }
-
-        private static string[] ObtenerListaColumnasBD()
+        protected override string[] ObtenerListaColumnasBD()
         {
             return
             [
@@ -147,6 +104,20 @@ namespace BibliotecaClases.BD
                 "Aula",
                 "CupoMaximo"
             ];
+        }
+
+        protected override SqlDbType GetSqlDbType(string key)
+        {
+            SqlDbType retorno;
+
+            if (key == "CursoID") retorno = SqlDbType.VarChar;
+            else if (key == "MateriaID") retorno = SqlDbType.VarChar;
+            else if (key == "Nombre") retorno = SqlDbType.VarChar;
+            else if (key == "Aula") retorno = SqlDbType.VarChar;
+            else if (key == "CupoMaximo") retorno = SqlDbType.Int;
+            else retorno = SqlDbType.Variant;
+
+            return retorno;
         }
     }
 }

@@ -54,8 +54,8 @@ namespace BibliotecaClases.BD
     public abstract class SQLCrud<T> : SQLDB<T> where T : class
     {
         private readonly string _tableName;
-        private Dictionary<string, object> _where = new Dictionary<string, object>();
-        private Dictionary<string, object> _set = new Dictionary<string, object>();
+        private Dictionary<string, object?> _where = new Dictionary<string, object>();
+        private Dictionary<string, object?> _set = new Dictionary<string, object>();
         private List<string> _columns = new List<string>();
         private List<string> _joins = new List<string>();
 
@@ -65,8 +65,10 @@ namespace BibliotecaClases.BD
             _tableName = tableName;
         }
 
-        public List<T> GetAll(Func<IDataRecord, T> mapeo)
+        public List<T> InternalGetAll(Func<IDataRecord, T> mapeo)
         {
+            AddColums(ObtenerListaColumnasBD());
+
             var query = PrepareSelectQuery();
             _comando.CommandText = query;
 
@@ -75,8 +77,15 @@ namespace BibliotecaClases.BD
             return resultado;
         }
 
-        public List<T> SearchWhere(Func<IDataRecord, T> mapeo)
+        public List<T> InternalSearchWhere(Func<IDataRecord, T> mapeo, Dictionary<string, object> campoValores)
         {
+            AddColums(ObtenerListaColumnasBD());
+
+            foreach (var item in campoValores)
+            {
+                AddWhereCondition(item.Key, item.Value);
+            }
+
             var query = PrepareSelectQuery();
             _comando.CommandText = query;
 
@@ -121,14 +130,14 @@ namespace BibliotecaClases.BD
             {
                 foreach (var join in _joins)
                 {
-                    query.AppendLine(join);
+                    query.AppendFormat(" {0}", join);
                 }
             }
 
             if (_where.Count > 0)
             {
-                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @{x.Key}").ToArray());
-                query.AppendLine($"WHERE {where}");
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
+                query.Append($" WHERE {where}");
             }
 
             return query.ToString();
@@ -158,7 +167,7 @@ namespace BibliotecaClases.BD
 
             if (_where != null)
             {
-                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Key}").ToArray());
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
                 query.Append($" WHERE {where}");
             }
 
@@ -171,7 +180,7 @@ namespace BibliotecaClases.BD
 
             StringBuilder query = new StringBuilder();
 
-            var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Key}").ToArray());
+            var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
 
             query.AppendFormat("DELETE FROM {0} WHERE {1}", _tableName, where);
 
@@ -204,18 +213,28 @@ namespace BibliotecaClases.BD
             }
         }
 
-        protected void AddWhereCondition(string columna, object valor)
+        protected void AddWhereCondition(string columna, object? valor)
         {
-            _where.Add(columna, valor);
+            _where.Add(columna, columna);
             _comando.Parameters.Add($"@w{columna}", GetSqlDbType(columna));
-            _comando.Parameters[$"@w{columna}"].Value = valor;
+            if (valor != null ) _comando.Parameters[$"@w{columna}"].Value = valor;
+            else _comando.Parameters[$"@w{columna}"].Value = DBNull.Value;
         }
 
-        protected void AddSetValue(string columna, object valor)
+        protected void AddWhereCondition(string tableName, string columna, object? valor)
+        {
+            _where.Add($"{tableName}.{columna}", $"{tableName}{columna}");
+            _comando.Parameters.Add($"@w{tableName}{columna}", GetSqlDbType(columna));
+            if (valor != null) _comando.Parameters[$"@w{tableName}{columna}"].Value = valor;
+            else _comando.Parameters[$"@w{tableName}{columna}"].Value = DBNull.Value;
+        }
+
+        protected void AddSetValue(string columna, object? valor)
         {
             _set.Add(columna, valor);
             _comando.Parameters.Add($"@s{columna}", GetSqlDbType(columna));
-            _comando.Parameters[$"@s{columna}"].Value = valor;
+            if (valor != null) _comando.Parameters[$"@s{columna}"].Value = valor;
+            else _comando.Parameters[$"@s{columna}"].Value = DBNull.Value;
         }
 
         protected void AddJoin(string joinType, string externalTableName, string externalTableId, string tableId)

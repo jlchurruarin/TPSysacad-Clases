@@ -41,73 +41,68 @@ namespace BibliotecaClases.BD
             Direccion = direccion;
         }
 
-        public int Add()
+        public new int Add()
         {
 
             //Microsoft.Data.SqlClient.SqlException a validar
-
-            ConfigurarParametros();
-
-            string[] columnasBD = ObtenerListaColumnasBD();
+            AddSetValue("UsuarioId", Id);
+            AddSetValue("TipoUsuario", TipoDeUsuario);
+            AddSetValue("Legajo", Legajo);
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Apellido", Apellido);
+            AddSetValue("CorreoElectronico", CorreoElectronico);
+            AddSetValue("Contrasenia", Contraseña);
+            AddSetValue("CambioObligatorio", CambioDeContraseñaObligatorio);
+            AddSetValue("DNI", Dni);
+            AddSetValue("NumeroDeTelefono", NumeroDeTelefono);
+            AddSetValue("Direccion", Direccion);
 
             return base.Add();
         }
 
-        public int Delete()
+        public new int Delete()
         {
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "UsuarioId", Id }
-            };
+            AddWhereCondition("UsuarioId", Id);
 
             return base.Delete();
+        }
+
+        public new int Update()
+        {
+            AddSetValue("TipoUsuario", TipoDeUsuario);
+            AddSetValue("Legajo", Legajo);
+            AddSetValue("Nombre", Nombre);
+            AddSetValue("Apellido", Apellido);
+            AddSetValue("CorreoElectronico", CorreoElectronico);
+            AddSetValue("Contrasenia", Contraseña);
+            AddSetValue("CambioObligatorio", CambioDeContraseñaObligatorio);
+            AddSetValue("DNI", Dni);
+            AddSetValue("NumeroDeTelefono", NumeroDeTelefono);
+            AddSetValue("Direccion", Direccion);
+
+            AddWhereCondition("UsuarioId", Id);
+
+            return base.Update();
         }
 
         public static List<Usuario> GetAll()
         {
             Usuario usuario = new Usuario();
-            return usuario.InternalGetAll(ObtenerListaColumnasBD());
-        }
-
-        public static List<Usuario> GetAll(string[] columnas)
-        {
-            Usuario usuario = new Usuario();
-            return usuario.InternalGetAll(columnas);
-        }
-
-        private List<Usuario> InternalGetAll(string[] columnas)
-        {
-            return base.GetAll(Map);
+            return usuario.InternalGetAll(usuario.Map);
         }
 
         public static List<Usuario> SearchWhere(Dictionary<string, object> campoValores)
         {
             Usuario usuario = new Usuario();
-            return usuario.InternalSearchWhere(ObtenerListaColumnasBD(), campoValores);
+            return usuario.InternalSearchWhere(usuario.Map, campoValores);
         }
 
-        public static List<Usuario> SearchWhere(string[] columnas, Dictionary<string, object> campoValores)
+        public static List<Usuario> GetUsuariosInscriptos(Curso curso)
         {
             Usuario usuario = new Usuario();
-            return usuario.InternalSearchWhere(columnas, campoValores);
-        }
-
-        private List<Usuario> InternalSearchWhere(string[] columnas, Dictionary<string, object> campoValores)
-        {
-            return base.SearchWhere(Map);
-        }
-
-        public int Update()
-        {
-            string[] columnasBD = ObtenerListaColumnasBD();
-            ConfigurarParametros();
-
-            Dictionary<string, object> camposValor = new Dictionary<string, object>
-            {
-                { "UsuarioId", Id }
-            };
-
-            return base.Update();
+            usuario.AddJoin("INNER JOIN", "Inscripciones", "EstudianteID", "EstudianteID");
+            usuario.AddWhereCondition("Inscripciones", "CursoID", curso.Id);
+            return usuario.InternalSearchWhere(usuario.Map, new Dictionary<string, object>());
         }
 
         public Usuario Map(IDataRecord reader)
@@ -131,7 +126,7 @@ namespace BibliotecaClases.BD
             return usuario;
         }
 
-        private static string[] ObtenerListaColumnasBD()
+        protected override string[] ObtenerListaColumnasBD()
         {
             return
             [
@@ -149,31 +144,24 @@ namespace BibliotecaClases.BD
             ];
         }
 
-        private void ConfigurarParametros()
+        protected override SqlDbType GetSqlDbType(string key)
         {
-            _comando.Parameters.Clear();
-            _comando.Parameters.Add("@UsuarioId", SqlDbType.VarChar);
-            _comando.Parameters["@UsuarioId"].Value = Id;
-            _comando.Parameters.Add("@TipoUsuario", SqlDbType.TinyInt);
-            _comando.Parameters["@TipoUsuario"].Value = (int) TipoDeUsuario;
-            _comando.Parameters.Add("@Legajo", SqlDbType.Int);
-            _comando.Parameters["@Legajo"].Value = Legajo;
-            _comando.Parameters.Add("@Nombre", SqlDbType.VarChar);
-            _comando.Parameters["@Nombre"].Value = Nombre;
-            _comando.Parameters.Add("@Apellido", SqlDbType.VarChar);
-            _comando.Parameters["@Apellido"].Value = Apellido;
-            _comando.Parameters.Add("@CorreoElectronico", SqlDbType.VarChar);
-            _comando.Parameters["@CorreoElectronico"].Value = CorreoElectronico;
-            _comando.Parameters.Add("@Contrasenia", SqlDbType.VarChar);
-            _comando.Parameters["@Contrasenia"].Value = Contraseña;
-            _comando.Parameters.Add("@CambioObligatorio", SqlDbType.Bit);
-            _comando.Parameters["@CambioObligatorio"].Value = CambioDeContraseñaObligatorio;
-            _comando.Parameters.Add("@DNI", SqlDbType.Int);
-            _comando.Parameters["@DNI"].Value = Dni;
-            _comando.Parameters.Add("@NumeroDeTelefono", SqlDbType.VarChar);
-            _comando.Parameters["@NumeroDeTelefono"].Value = NumeroDeTelefono;
-            _comando.Parameters.Add("@Direccion", SqlDbType.VarChar);
-            _comando.Parameters["@Direccion"].Value = Direccion;
+            SqlDbType retorno;
+
+            if (key == "UsuarioId") retorno = SqlDbType.VarChar;
+            else if (key == "TipoUsuario") retorno = SqlDbType.TinyInt;
+            else if (key == "Legajo") retorno = SqlDbType.Int;
+            else if (key == "Nombre") retorno = SqlDbType.VarChar;
+            else if (key == "Apellido") retorno = SqlDbType.VarChar;
+            else if (key == "CorreoElectronico") retorno = SqlDbType.VarChar;
+            else if (key == "Contrasenia") retorno = SqlDbType.VarChar;
+            else if (key == "CambioObligatorio") retorno = SqlDbType.Bit;
+            else if (key == "DNI") retorno = SqlDbType.Int;
+            else if (key == "NumeroDeTelefono") retorno = SqlDbType.VarChar;
+            else if (key == "Direccion") retorno = SqlDbType.VarChar;
+            else retorno = SqlDbType.Variant;
+
+            return retorno;
         }
 
     }
