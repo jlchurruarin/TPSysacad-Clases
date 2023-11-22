@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BibliotecaClases.BD
+namespace BibliotecaClases.Interfaces
 {
-    public interface IUsuario
+    public interface ISQLRemoveVista
     {
-
 
     }
 }

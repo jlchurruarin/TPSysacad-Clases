@@ -9,7 +9,7 @@ namespace BibliotecaClases.BD
 {
     public partial class Inscripcion : SQLCrud<Inscripcion>, ICRUDOps<Inscripcion>
     {
-        public string EstudianteId { get; set; }
+        public string EstudianteId { get;  }
         public string CursoId { get; set; }
         public EstadoCursada EstadoDeInscripcion { get; set; }
         public DateTime FechaInscripcion { get; set; }

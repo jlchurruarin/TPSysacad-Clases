@@ -13,7 +13,7 @@ namespace BibliotecaClases.BD
         {
 
         }
-        public Pago(Estudiante estudiante, ConceptoPago conceptoPago,decimal monto) : this(estudiante.Id, conceptoPago, monto) { }
+        public Pago(Usuario estudiante, ConceptoPago conceptoPago,decimal monto) : this(estudiante.Id, conceptoPago, monto) { }
 
         public Pago(string estudianteId, ConceptoPago conceptoPago, decimal monto) : this() 
         {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using BibliotecaClases.BD;
+using BibliotecaClases.Interfaces;
 
 namespace BibliotecaClases
 {
@@ -29,7 +30,7 @@ namespace BibliotecaClases
             catch
             {
                 FakeBaseDeDatos baseDeDatos = new FakeBaseDeDatos();
-                Administrador administrador = new Administrador(1234, "Admin", "Admin", "Admin@admin.com", "1234", 1234);
+                Usuario administrador = new Usuario(TipoDeUsuario.Administrador, 1234, "Admin", "Admin", "Admin@admin.com", "1234", 1234);
                 if (baseDeDatos + administrador)
                 {
                     return baseDeDatos;
@@ -48,34 +49,34 @@ namespace BibliotecaClases
             return stringUUID;
         }
 
-        public static bool VerificarDisponibilidadHoraria(Estudiante estudiante, Curso curso)
+        public static bool VerificarDisponibilidadHoraria(Usuario estudiante, Curso curso)
         {
             return true;
         }
-
-        /*
-        public static List<string> GenerarCalendario(List<Curso> listaCursos, Estudiante estudiante)
-        {
-            List<String> calendarioCursos = new List<string>();
-
-            foreach (Curso curso in listaCursos)
-            {
-                if (curso.ListaDeInscripciones.Any(inscripcion => inscripcion.IdEstudiante == estudiante.Id))
-                {
-                    foreach(Horario horario in curso.Horario)
-                    {
-                        calendarioCursos.Add($"{horario.Dia} {horario.ObtenerHoraInicio()}: {curso.NombreCursada} - Aula: {curso.Aula} ({horario.CargaHoraria} horas)");
-                    }
-                }
-            }
-
-            return calendarioCursos;
-        }
-        */
 
         public static string EncriptarTexto(string texto)
         {
             return BCrypt.Net.BCrypt.EnhancedHashPassword(texto, 9);
         }
+
+        public static void ValidarLogin(ILoginVista loginVista, TipoDeUsuario tipoDeUsuario, string correo, string cotraseña)
+        {
+            Usuario? usuario = Usuario.ObtenerUsuario(TipoDeUsuario.Administrador, correo, cotraseña);
+
+            if (usuario == null)
+            {
+                loginVista.OnLoginFail();
+            }
+            else if (usuario.CambioDeContraseñaObligatorio)
+            {
+                loginVista.OnLoginCambioDeContraseñaObligatorio();
+            }
+            else
+            {
+                loginVista.OnLoginOk();
+            }
+
+        }
+
     }
 }

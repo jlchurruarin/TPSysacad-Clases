@@ -54,8 +54,8 @@ namespace BibliotecaClases.BD
     public abstract class SQLCrud<T> : SQLDB<T> where T : class
     {
         private readonly string _tableName;
-        private Dictionary<string, object?> _where = new Dictionary<string, object>();
-        private Dictionary<string, object?> _set = new Dictionary<string, object>();
+        private Dictionary<string, object> _where = new Dictionary<string, object>();
+        private Dictionary<string, object> _set = new Dictionary<string, object>();
         private List<string> _columns = new List<string>();
         private List<string> _joins = new List<string>();
 
@@ -65,7 +65,7 @@ namespace BibliotecaClases.BD
             _tableName = tableName;
         }
 
-        public List<T> InternalGetAll(Func<IDataRecord, T> mapeo)
+        internal List<T> InternalGetAll(Func<IDataRecord, T> mapeo)
         {
             AddColums(ObtenerListaColumnasBD());
 
@@ -77,7 +77,7 @@ namespace BibliotecaClases.BD
             return resultado;
         }
 
-        public List<T> InternalSearchWhere(Func<IDataRecord, T> mapeo, Dictionary<string, object> campoValores)
+        internal List<T> InternalSearchWhere(Func<IDataRecord, T> mapeo, Dictionary<string, object> campoValores)
         {
             AddColums(ObtenerListaColumnasBD());
 
@@ -187,12 +187,12 @@ namespace BibliotecaClases.BD
             return query.ToString();
         }
 
-        protected void AddColums(string columna)
+        private protected void AddColums(string columna)
         {
             _columns.Add($"{_tableName}.{columna}");
         }
 
-        protected void AddColums(string[] columnas)
+        private protected void AddColums(string[] columnas)
         {
             foreach (var item in columnas)
             {
@@ -200,12 +200,12 @@ namespace BibliotecaClases.BD
             }
         }
 
-        protected void AddColums(string tableName, string columna)
+        private protected void AddColums(string tableName, string columna)
         {
             AddColums($"{tableName}.{columna}");
         }
 
-        protected void AddColums(string tableName, string[] columnas)
+        private protected void AddColums(string tableName, string[] columnas)
         {
             foreach (var item in columnas)
             {
@@ -213,7 +213,7 @@ namespace BibliotecaClases.BD
             }
         }
 
-        protected void AddWhereCondition(string columna, object? valor)
+        private protected void AddWhereCondition(string columna, object? valor)
         {
             _where.Add(columna, columna);
             _comando.Parameters.Add($"@w{columna}", GetSqlDbType(columna));
@@ -221,7 +221,7 @@ namespace BibliotecaClases.BD
             else _comando.Parameters[$"@w{columna}"].Value = DBNull.Value;
         }
 
-        protected void AddWhereCondition(string tableName, string columna, object? valor)
+        private protected void AddWhereCondition(string tableName, string columna, object? valor)
         {
             _where.Add($"{tableName}.{columna}", $"{tableName}{columna}");
             _comando.Parameters.Add($"@w{tableName}{columna}", GetSqlDbType(columna));
@@ -229,15 +229,15 @@ namespace BibliotecaClases.BD
             else _comando.Parameters[$"@w{tableName}{columna}"].Value = DBNull.Value;
         }
 
-        protected void AddSetValue(string columna, object? valor)
+        private protected void AddSetValue(string columna, object valor)
         {
             _set.Add(columna, valor);
             _comando.Parameters.Add($"@s{columna}", GetSqlDbType(columna));
-            if (valor != null) _comando.Parameters[$"@s{columna}"].Value = valor;
+            if (valor.ToString() != "") _comando.Parameters[$"@s{columna}"].Value = valor;
             else _comando.Parameters[$"@s{columna}"].Value = DBNull.Value;
         }
 
-        protected void AddJoin(string joinType, string externalTableName, string externalTableId, string tableId)
+        private protected void AddJoin(string joinType, string externalTableName, string externalTableId, string tableId)
         {
             _joins.Add($"{joinType} {externalTableName} ON {externalTableId} = {tableId}");
         }

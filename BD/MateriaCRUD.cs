@@ -13,10 +13,17 @@ namespace BibliotecaClases.BD
     public partial class Materia : SQLCrud<Materia>, ICRUDOps<Materia>
     {
 
-        public string Id { get; set; }
+        public string Id { get; internal set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
 
+        public string DisplayText
+        {
+            get
+            {
+                return $"DisplayText: {ToString()}";
+            }
+        }
 
         public Materia(string id, string nombre, string descripcion) : base("Materias")
         {
@@ -48,10 +55,29 @@ namespace BibliotecaClases.BD
             return base.Update();
         }
 
+        public static Materia? ObtenerMateriaPorID(string id)
+        {
+            Materia materia = new Materia();
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("MateriaID", id);
+            List<Materia> materias = materia.InternalSearchWhere(materia.Map, where);
+
+            if (materias.Count == 0) return null;
+
+            return materias[0];
+        }
+
         public static List<Materia> GetAll()
         {
             Materia mat = new Materia();
             return mat.InternalGetAll(mat.Map);
+        }
+
+        public List<Materia> GetMateriasRequeridas()
+        {
+            AddJoin("INNER JOIN", "RequisitosMaterias", "MateriaID", "RequisitoMateriaID");
+            AddWhereCondition("RequisitosMaterias", "MateriaID", Id);
+            return InternalSearchWhere(Map, new Dictionary<string, object>());
         }
 
         public static List<Materia> SearchWhere(Dictionary<string, object> campoValores)

@@ -10,17 +10,22 @@ namespace BibliotecaClases.BD
     public partial class Curso : SQLCrud<Curso>, ICRUDOps<Curso>
     {
 
-        public string Id { get; set; }
-        public string MateriaId { get; set; }
+        public string Id { get; internal set; }
         public string Nombre { get; set; }
         public string Aula { get; set; }
         public int CupoMaximo { get; set; }
 
+        public string DisplayText
+        {
+            get
+            {
+                return $"DisplayText: {ToString()}";
+            }
+        }
 
-        private Curso(string id, string materiaId, string nombre, string aula, int cupoMaximo) : base("Cursos")
+        private Curso(string id, string nombre, string aula, int cupoMaximo) : base("Cursos")
         {
             Id = id;
-            MateriaId = materiaId;
             Nombre = nombre;
             Aula = aula;
             CupoMaximo = cupoMaximo;
@@ -29,7 +34,6 @@ namespace BibliotecaClases.BD
         public new int Add()
         {
             AddSetValue("CursoID", Id);
-            AddSetValue("MateriaID", MateriaId);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Aula", Aula);
             AddSetValue("CupoMaximo", CupoMaximo);
@@ -44,7 +48,6 @@ namespace BibliotecaClases.BD
 
         public new int Update()
         {
-            AddSetValue("MateriaID", MateriaId);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Aula", Aula);
             AddSetValue("CupoMaximo", CupoMaximo);
@@ -65,6 +68,19 @@ namespace BibliotecaClases.BD
             return curso.InternalSearchWhere(curso.Map, campoValores);
         }
 
+        public static Curso? ObtenerCursoPorID(string id)
+        {
+            Curso curso = new Curso();
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("CursoID", id);
+            List<Curso> cursos = curso.InternalSearchWhere(curso.Map, where);
+
+            if (cursos.Count == 0) return null;
+
+            return cursos[0];
+        }
+
+
         public List<Usuario> GetIncriptos()
         {
             return Usuario.GetUsuariosInscriptos(this);
@@ -84,12 +100,11 @@ namespace BibliotecaClases.BD
         public Curso Map(IDataRecord reader)
         {
             var id = reader["CursoID"].ToString() ?? "";
-            var materiaId = reader["MateriaID"].ToString() ?? "";
             var nombre = reader["Nombre"].ToString() ?? "";
             var aula = reader["Aula"].ToString() ?? "";
             var cupoMaximo = reader.GetInt32(reader.GetOrdinal("CupoMaximo"));
 
-            var curso = new Curso(id, materiaId, nombre, aula, cupoMaximo);
+            var curso = new Curso(id, nombre, aula, cupoMaximo);
 
             return curso;
         }
@@ -99,7 +114,6 @@ namespace BibliotecaClases.BD
             return
             [
                 "CursoID",
-                "MateriaID",
                 "Nombre",
                 "Aula",
                 "CupoMaximo"
@@ -111,7 +125,6 @@ namespace BibliotecaClases.BD
             SqlDbType retorno;
 
             if (key == "CursoID") retorno = SqlDbType.VarChar;
-            else if (key == "MateriaID") retorno = SqlDbType.VarChar;
             else if (key == "Nombre") retorno = SqlDbType.VarChar;
             else if (key == "Aula") retorno = SqlDbType.VarChar;
             else if (key == "CupoMaximo") retorno = SqlDbType.Int;

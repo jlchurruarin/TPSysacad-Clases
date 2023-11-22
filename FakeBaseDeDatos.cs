@@ -10,25 +10,25 @@ namespace BibliotecaClases
 	{
         // @"Server=.;Database=prog2;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True;"
 
-        private List<Estudiante> _listaEstudiantes;
-        private List<Profesor> _listaProfesores;
-        private List<Administrador> _listaAdministradores;
+        private List<Usuario> _listaEstudiantes;
+        private List<Usuario> _listaProfesores;
+        private List<Usuario> _listaAdministradores;
         private List<Materia> _listaMaterias;
         private List<Curso> _listaCursos;
 
-        public List <Estudiante> ListaEstudiantes
+        public List <Usuario> ListaEstudiantes
         {
             get { return _listaEstudiantes; }
             set { _listaEstudiantes = value; }
         }
 
-        public List<Profesor> ListaProfesores
+        public List<Usuario> ListaProfesores
         {
             get { return _listaProfesores; }
             set { _listaProfesores = value; }
         }
 
-        public List<Administrador> ListaAdministradores
+        public List<Usuario> ListaAdministradores
         {
             get { return _listaAdministradores; }
             set { _listaAdministradores = value; }
@@ -48,9 +48,9 @@ namespace BibliotecaClases
 
         public FakeBaseDeDatos()
         {
-            _listaAdministradores = new List<Administrador>();
-            _listaEstudiantes = new List<Estudiante>();
-            _listaProfesores = new List<Profesor>();
+            _listaAdministradores = new List<Usuario>();
+            _listaEstudiantes = new List<Usuario>();
+            _listaProfesores = new List<Usuario>();
             _listaMaterias = new List<Materia>();
             _listaCursos = new List<Curso>();
         }
@@ -69,15 +69,15 @@ namespace BibliotecaClases
             return false;
         }
 
-        public Estudiante? BuscarEstudiantePorID(string id)
+        public Usuario? BuscarEstudiantePorID(string id)
         {
-            Estudiante? estudiante = _listaEstudiantes.Find(estudiante => estudiante.Id == id);
+            Usuario? estudiante = _listaEstudiantes.Find(estudiante => estudiante.Id == id);
             return estudiante;
         }
 
-        public Profesor? BuscarProfesorPorID(string id)
+        public Usuario? BuscarProfesorPorID(string id)
         {
-            Profesor? profesor = _listaProfesores.Find(profesor => profesor.Id == id);
+            Usuario? profesor = _listaProfesores.Find(profesor => profesor.Id == id);
             return profesor;
         }
 
@@ -93,7 +93,7 @@ namespace BibliotecaClases
             return curso;
         }
 
-        public Estudiante? BuscarEstudiantePorCorreo(string correo)
+        public Usuario? BuscarEstudiantePorCorreo(string correo)
         {
             Usuario? usuario = BuscarPorCorreo(_listaEstudiantes.ConvertAll(estudiante => (Usuario) estudiante), correo);
             if (usuario == null) 
@@ -102,11 +102,11 @@ namespace BibliotecaClases
             }
             else 
             { 
-                return (Estudiante) usuario; 
+                return usuario; 
             }
         }
 
-        public Profesor? BuscarProfesorPorCorreo(string correo)
+        public Usuario? BuscarProfesorPorCorreo(string correo)
         {
             Usuario? usuario = BuscarPorCorreo(_listaProfesores.ConvertAll(profesor => (Usuario) profesor), correo);
             if (usuario == null)
@@ -115,11 +115,11 @@ namespace BibliotecaClases
             }
             else
             {
-                return (Profesor)usuario;
+                return usuario;
             }
         }
 
-        public Administrador? BuscarAdministradorPorCorreo(string correo)
+        public Usuario? BuscarAdministradorPorCorreo(string correo)
         {
             Usuario? usuario = BuscarPorCorreo(_listaAdministradores.ConvertAll(administrador => (Usuario) administrador), correo);
             if (usuario == null)
@@ -128,7 +128,7 @@ namespace BibliotecaClases
             }
             else
             {
-                return (Administrador)usuario;
+                return usuario;
             }
         }
 
@@ -143,7 +143,7 @@ namespace BibliotecaClases
         }
 
         
-        public List<Curso> BuscarCursosInscriptos(Estudiante estudiante)
+        public List<Curso> BuscarCursosInscriptos(Usuario estudiante)
         {
             List<Curso> listaCursosFiltrados = new List<Curso>();
 
@@ -159,14 +159,14 @@ namespace BibliotecaClases
             return listaCursosFiltrados;
         }
 
-        public List<Curso> BuscarCursos(Profesor profesor)
+        public List<Curso> BuscarCursos(Usuario profesor)
         {
             //List<Curso> ListaCursosFiltrados = _listaCursos.Where(cursoInscripto => cursoInscripto.IdProfesor == profesor.Id).ToList();
             List<Curso> ListaCursosFiltrados = new List<Curso> { };
             return ListaCursosFiltrados;
         }
 
-        public List<Curso> ObtenerCursosDisponibles(Estudiante estudiante)
+        public List<Curso> ObtenerCursosDisponibles(Usuario estudiante)
         {
             List<Curso> cursosDisponibles = new List<Curso>();
             List<Curso> cursosEstudiante = BuscarCursosInscriptos(estudiante);
@@ -197,7 +197,7 @@ namespace BibliotecaClases
             return cursosDisponibles;
         }
 
-        public static bool operator +(FakeBaseDeDatos bd, Estudiante estudiante)
+        public static bool operator +(FakeBaseDeDatos bd, Usuario estudiante)
         {
             if (bd.BuscarEstudiantePorCorreo(estudiante.CorreoElectronico) is null && 
                 bd.BuscarEstudiantePorID(estudiante.Id) is null && 
@@ -212,7 +212,7 @@ namespace BibliotecaClases
             }
         }
 
-        public static bool operator -(FakeBaseDeDatos bd, Estudiante estudiante)
+        public static bool operator -(FakeBaseDeDatos bd, Usuario estudiante)
         {
             if (bd._listaEstudiantes.Any(e => e.Id == estudiante.Id))
             {
@@ -225,70 +225,6 @@ namespace BibliotecaClases
             }
         }
 
-        public static bool operator +(FakeBaseDeDatos bd, Profesor profesor)
-        {
-            if (bd.BuscarProfesorPorCorreo(profesor.CorreoElectronico) is null && bd.BuscarProfesorPorID(profesor.Id) is null)
-            {
-                bd._listaProfesores.Add(profesor);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool operator -(FakeBaseDeDatos bd, Profesor profesor)
-        {
-            if (bd._listaProfesores.Any(p => p.Id == profesor.Id))
-            {
-                bd._listaProfesores.RemoveAll(p => p.Id == profesor.Id);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool operator +(FakeBaseDeDatos bd, Administrador administrador)
-        {
-            if (bd.BuscarAdministradorPorCorreo(administrador.CorreoElectronico) is null)
-            {
-                bd._listaAdministradores.Add(administrador);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool operator -(FakeBaseDeDatos bd, Administrador administrador)
-        {
-            if (bd._listaAdministradores.Any(a => a.Id == administrador.Id))
-            {
-                bd._listaAdministradores.RemoveAll(a => a.Id == administrador.Id);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool operator +(FakeBaseDeDatos bd, Curso curso)
-        {
-            if (!bd._listaCursos.Any(c => c.Id == curso.Id))
-            {
-                bd._listaCursos.Add(curso);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         public static bool operator -(FakeBaseDeDatos bd, Curso curso)
         {

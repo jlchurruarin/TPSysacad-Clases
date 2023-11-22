@@ -11,8 +11,7 @@ namespace BibliotecaClases.BD
     public partial class Usuario : SQLCrud<Usuario>, ICRUDOps<Usuario>
     {
 
-
-        public string Id { get; set; }
+        public string Id { get; internal set; }
         public TipoDeUsuario TipoDeUsuario { get; set; }
         public int Legajo { get; set; }
         public string Nombre { get; set; }
@@ -23,6 +22,14 @@ namespace BibliotecaClases.BD
         public int Dni { get; set; }
         public string NumeroDeTelefono { get; set; }
         public string Direccion { get; set; }
+
+        public string DisplayText
+        {
+            get
+            {
+                return $"DisplayText: {ToString()}";
+            }
+        }
 
         protected Usuario(string id, TipoDeUsuario tipoDeUsuario, int legajo, string nombre, string apellido, 
                         string correoElectronico, string contraseña, int dni, 
@@ -50,7 +57,7 @@ namespace BibliotecaClases.BD
             AddSetValue("Legajo", Legajo);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Apellido", Apellido);
-            AddSetValue("CorreoElectronico", CorreoElectronico);
+            AddSetValue("CorreoElectronico", CorreoElectronico.ToLower());
             AddSetValue("Contrasenia", Contraseña);
             AddSetValue("CambioObligatorio", CambioDeContraseñaObligatorio);
             AddSetValue("DNI", Dni);
@@ -63,7 +70,7 @@ namespace BibliotecaClases.BD
         public new int Delete()
         {
             AddWhereCondition("UsuarioId", Id);
-
+            AddWhereCondition("TipoUsuario", TipoDeUsuario);
             return base.Delete();
         }
 
@@ -74,7 +81,7 @@ namespace BibliotecaClases.BD
             AddSetValue("Nombre", Nombre);
             AddSetValue("Apellido", Apellido);
             AddSetValue("CorreoElectronico", CorreoElectronico);
-            AddSetValue("Contrasenia", Contraseña);
+            if (Contraseña != "") { AddSetValue("Contrasenia", Contraseña); }
             AddSetValue("CambioObligatorio", CambioDeContraseñaObligatorio);
             AddSetValue("DNI", Dni);
             AddSetValue("NumeroDeTelefono", NumeroDeTelefono);
@@ -95,6 +102,41 @@ namespace BibliotecaClases.BD
         {
             Usuario usuario = new Usuario();
             return usuario.InternalSearchWhere(usuario.Map, campoValores);
+        }
+
+        public static List<Usuario> GetAll(TipoDeUsuario tipoDeUsuario)
+        {
+            Usuario usuario = new Usuario();
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("TipoUsuario", tipoDeUsuario);
+            return usuario.InternalSearchWhere(usuario.Map, where);
+        }
+
+        public static Usuario? ObtenerUsuario(TipoDeUsuario tipoDeUsuario, string correo, string contraseña)
+        {
+            Usuario usuario = new Usuario();
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("TipoUsuario", tipoDeUsuario);
+            where.Add("CorreoElectronico", correo.ToLower());
+            List<Usuario> usuarios = usuario.InternalSearchWhere(usuario.Map, where);
+
+            if (usuarios.Count == 0) { return null; }
+
+            if (usuarios[0].ValidarContraseña(contraseña)) return usuarios[0];
+            else { return null; }
+        }
+
+        public static Usuario? ObtenerUsuarioPorID(TipoDeUsuario tipoDeUsuario, string usuarioID)
+        {
+            Usuario usuario = new Usuario();
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("TipoUsuario", tipoDeUsuario);
+            where.Add("UsuarioID", usuarioID);
+            List<Usuario> usuarios = usuario.InternalSearchWhere(usuario.Map, where);
+
+            if (usuarios.Count == 0) { return null; }
+
+            return usuarios[0];
         }
 
         public static List<Usuario> GetUsuariosInscriptos(Curso curso)

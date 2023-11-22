@@ -10,13 +10,20 @@ namespace BibliotecaClases.BD
 {
     public partial class Pago : SQLCrud<Pago>, ICRUDOps<Pago>
     {
-        public string Id { get; set; }
+        public string Id { get; }
         public string EstudianteId { get; set; }
         public ConceptoPago ConceptoDePago { get; set; }
         public EstadoPago EstadoDePago { get; set; }
         public MetodoPago? MetodoDePago { get; set; }
         public decimal Monto { get; set; }
 
+        public string DisplayText
+        {
+            get
+            {
+                return $"DisplayText: {ToString()}";
+            }
+        }
 
         public Pago(string id, string estudianteId, ConceptoPago conceptoDePago, EstadoPago estadoDePago, decimal monto) : base("Pagos") 
         {
@@ -62,6 +69,15 @@ namespace BibliotecaClases.BD
             AddSetValue("Monto", Monto);
 
             return base.Update();
+        }
+
+        public static List<Pago> ObtenerPagoPorID(string id)
+        {
+            Dictionary<string, object> where = new Dictionary<string, object>();
+            where.Add("PagoID", id);
+
+            Pago pago = new Pago();
+            return pago.InternalSearchWhere(pago.Map, where);
         }
 
         public static List<Pago> GetAll()

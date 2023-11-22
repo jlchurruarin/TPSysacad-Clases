@@ -9,7 +9,7 @@ namespace BibliotecaClases.BD
 {
     public partial class HorarioCurso : SQLCrud<HorarioCurso>, ICRUDOps<HorarioCurso>
     {
-        public string Id { get; set; }
+        public string Id { get; }
         public Dia Dia { get; set; }
         public DateTime HoraInicio { get; set; }
         public DateTime HoraFin { get; set; }

@@ -9,20 +9,15 @@ namespace BibliotecaClases.BD
     public partial class Curso
     {
 
-        private Curso() : this(Sistema.GenerarUUID(), string.Empty, string.Empty, string.Empty, 0)
+        private Curso() : this(Sistema.GenerarUUID(), string.Empty, string.Empty, 0)
         {
         }
 
-        public Curso(string materiaID, string nombreCursada, string aula, int cupoMaximo) : this()
+        public Curso(string nombreCursada, string aula, int cupoMaximo) : this()
         {
-            MateriaId = materiaID;
             Nombre = nombreCursada;
             Aula = aula;
             CupoMaximo = cupoMaximo;
-        }
-
-        public Curso(Materia materia, string nombreCursada, string aula, int cupoMaximo) : this(materia.Id, nombreCursada, aula, cupoMaximo)
-        {
         }
 
         public override string ToString()
@@ -61,25 +56,6 @@ namespace BibliotecaClases.BD
                 */
                 return false;
             }
-        }
-
-        public static bool operator -(Curso curso, Estudiante estudiante)
-        {
-            //TODO
-            /*
-            Inscripcion? inscripcion = curso.ListaDeInscripciones.Find(inscripcion => inscripcion.IdEstudiante == estudiante.Id);
-
-            if (inscripcion is null)
-            {
-                return false;
-            }
-            else
-            {
-                curso.ListaDeInscripciones.Remove(inscripcion);
-                return true;
-            }
-            */
-            return true;
         }
 
 

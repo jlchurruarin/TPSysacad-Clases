@@ -22,7 +22,7 @@ namespace BibliotecaClases.BD
             EstadoDeInscripcion = estadoDeInscripcion;
         }
 
-        public Inscripcion(Estudiante estudiante, Curso curso, EstadoCursada estadoDeInscripcion) : this(estudiante.Id, curso.Id, estadoDeInscripcion) { }
+        public Inscripcion(Usuario estudiante, Curso curso, EstadoCursada estadoDeInscripcion) : this(estudiante.Id, curso.Id, estadoDeInscripcion) { }
 
 
 

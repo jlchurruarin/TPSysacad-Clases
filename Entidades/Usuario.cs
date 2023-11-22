@@ -14,6 +14,10 @@ namespace BibliotecaClases.BD
         {
         }
 
+        internal Usuario(string id, TipoDeUsuario tipoDeUsuario) : this(id, tipoDeUsuario, 0, string.Empty, string.Empty, string.Empty, string.Empty, 0, false, string.Empty, string.Empty)
+        {
+        }
+
         public Usuario(TipoDeUsuario tipoDeUsuario, int legajo, string nombre, string apellido,
                         string correoElectronico, string contraseña, int dni) : this()
         {
