@@ -16,6 +16,8 @@ namespace BibliotecaClases.BD
         public string Id { get; internal set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        public int CreditosBrindados { get; set; }
+        public int CreditosNecesarios { get; set; }
 
         public string DisplayText
         {
@@ -25,11 +27,13 @@ namespace BibliotecaClases.BD
             }
         }
 
-        public Materia(string id, string nombre, string descripcion) : base("Materias")
+        public Materia(string id, string nombre, string descripcion, int creditosBrindados, int creditosNecesarios) : base("Materias")
         {
             Id = id;
             Nombre = nombre;
             Descripcion = descripcion;
+            CreditosBrindados = creditosBrindados;
+            CreditosNecesarios = creditosNecesarios;
         }
 
         public new int Add()
@@ -37,6 +41,8 @@ namespace BibliotecaClases.BD
             AddSetValue("MateriaID", Id);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Descripcion", Descripcion);
+            AddSetValue("CreditosBrindados", CreditosBrindados);
+            AddSetValue("CreditosNecesarios", CreditosNecesarios);
             return base.Add();
         }
 
@@ -51,7 +57,11 @@ namespace BibliotecaClases.BD
         {
             AddSetValue("Nombre", Nombre);
             AddSetValue("Descripcion", Descripcion);
+            AddSetValue("CreditosBrindados", CreditosBrindados);
+            AddSetValue("CreditosNecesarios", CreditosNecesarios);
+
             AddWhereCondition("MateriaID", Id);
+
             return base.Update();
         }
 
@@ -61,6 +71,18 @@ namespace BibliotecaClases.BD
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("MateriaID", id);
             List<Materia> materias = materia.InternalSearchWhere(materia.Map, where);
+
+            if (materias.Count == 0) return null;
+
+            return materias[0];
+        }
+
+        public static Materia? ObtenerMateriaPorCursoID(string id)
+        {
+            Materia materia = new Materia();
+            materia.AddJoin("INNER JOIN", "MateriaCurso", "MateriaID", "MateriaID");
+            materia.AddWhereCondition("MateriaCurso", "CursoID", id);
+            List<Materia> materias = materia.InternalSearchWhere(materia.Map, new Dictionary<string, object>());
 
             if (materias.Count == 0) return null;
 
@@ -91,8 +113,10 @@ namespace BibliotecaClases.BD
             var id = reader["MateriaID"].ToString() ?? "";
             var nombre = reader["Nombre"].ToString() ?? "";
             var descripcion = reader["Descripcion"].ToString() ?? "";
+            var creditosBrindados = reader.GetInt32(reader.GetOrdinal("CreditosBrindados"));
+            var creditosNecesarios = reader.GetInt32(reader.GetOrdinal("CreditosNecesarios"));
 
-            var materia = new Materia(id, nombre, descripcion);
+            var materia = new Materia(id, nombre, descripcion, creditosBrindados, creditosNecesarios);
 
             return materia;
         }
@@ -103,7 +127,10 @@ namespace BibliotecaClases.BD
             [ 
                 "MateriaID",
                 "Nombre",
-                "Descripcion"
+                "Descripcion",
+                "CreditosBrindados",
+                "CreditosNecesarios"
+
             ];
         }
 
@@ -114,6 +141,8 @@ namespace BibliotecaClases.BD
             if (key == "MateriaID") retorno = SqlDbType.VarChar;
             else if (key == "Nombre") retorno = SqlDbType.VarChar;
             else if (key == "Descripcion") retorno = SqlDbType.VarChar;
+            else if (key == "CreditosBrindados") retorno = SqlDbType.Int;
+            else if (key == "CreditosNecesarios") retorno = SqlDbType.Int;
             else retorno = SqlDbType.Variant;
 
             return retorno;

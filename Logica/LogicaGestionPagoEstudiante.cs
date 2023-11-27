@@ -27,6 +27,7 @@ namespace BibliotecaClases.Logica
             {
                 try { 
                     pagoAEliminar.Delete();
+                    _gestionPagoVista.OnRemoveOk();
                 }
                 catch (Exception ex)
                 {

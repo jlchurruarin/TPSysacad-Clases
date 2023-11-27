@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 
 namespace BibliotecaClases.Interfaces
 {
-    public interface IABMCurso : ISQLAddUpdateVista
+    public interface IABMInscripcion : ISQLAddUpdateVista
     {
+        public event Action<Curso, Usuario>? AlSolicitarInscripcion;
 
-        public event Action<string>? AlSolicitarCurso;
-
-        public void MostrarCurso(Curso? curso);
+        public void MostrarInscripcion(Inscripcion inscripcion);
     }
 }

@@ -19,9 +19,9 @@ namespace BibliotecaClases.BD
             set { _listaIdMateriasRequeridas = value; }
         }
 
-        public Materia() : this(string.Empty, string.Empty) { }
+        public Materia() : this(string.Empty, string.Empty, 0, 0) { }
 
-        public Materia(string nombre, string descripcion): this(Sistema.GenerarUUID(), nombre, descripcion) { }
+        public Materia(string nombre, string descripcion, int creditosBrindados, int creditosNecesarios): this(Sistema.GenerarUUID(), nombre, descripcion, creditosBrindados, creditosNecesarios) { }
 
         public static bool operator ==(Materia materia1, Materia Materia2)
         {

@@ -26,11 +26,11 @@ namespace BibliotecaClases.Logica
             _materiaVista.MostrarMateria(materia);
         }
 
-        public void AddMateria(string nombre, string descripcion)
+        public void AddMateria(string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
         {
             try
             {
-                ValidarMateria(nombre, descripcion);
+                ValidarMateria(nombre, descripcion, creditosBrindados, creditosNecesarios);
             }
             catch (Exception ex)
             {
@@ -38,7 +38,10 @@ namespace BibliotecaClases.Logica
                 return;
             }
 
-            Materia materia = new Materia(nombre, descripcion);
+            Int32.TryParse(creditosBrindados, out int intCreditosBrindados);
+            Int32.TryParse(creditosNecesarios, out int intcreditosNecesarios);
+
+            Materia materia = new Materia(nombre, descripcion, intCreditosBrindados, intcreditosNecesarios);
 
             try
             {
@@ -52,11 +55,11 @@ namespace BibliotecaClases.Logica
         }
 
 
-        public void UpdateMateria(string id, string nombre, string descripcion)
+        public void UpdateMateria(string id, string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
         {
             try
             {
-                ValidarMateria(nombre, descripcion);
+                ValidarMateria(nombre, descripcion, creditosBrindados, creditosNecesarios);
             }
             catch (Exception ex)
             {
@@ -64,12 +67,16 @@ namespace BibliotecaClases.Logica
                 return;
             }
 
-            Materia materia = new Materia(nombre, descripcion);
+            Int32.TryParse(creditosBrindados, out int intCreditosBrindados);
+            Int32.TryParse(creditosNecesarios, out int intcreditosNecesarios);
+
+            Materia materia = new Materia(nombre, descripcion, intCreditosBrindados, intcreditosNecesarios);
             materia.Id = id;
 
             try
             {
                 materia.Update();
+                _materiaVista.OnUpdateOk();
             }
             catch (Exception ex)
             {
@@ -77,9 +84,26 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        private void ValidarMateria(string nombre, string descripcion)
+        private void ValidarMateria(string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
         {
             if (string.IsNullOrEmpty(nombre)) { throw new Exception("Nombre no puede estar vacio"); }
+            if (string.IsNullOrEmpty(descripcion)) { throw new Exception("Descripcion no puede estar vacio"); }
+
+            bool cb = Int32.TryParse(creditosBrindados, out int intCreditosBrindados);
+            
+            if (cb == false) { throw new Exception("Creditos brindados debe ser un numero"); }
+            else
+            {
+                if (intCreditosBrindados < 0) { throw new Exception("Creditos brindados no puede ser menor a 0"); }
+            }
+
+            bool cn = Int32.TryParse(creditosNecesarios, out int intcreditosNecesarios);
+
+            if (cn == false) { throw new Exception("Creditos necesarios debe ser un numero"); }
+            else
+            {
+                if (intcreditosNecesarios < 0) { throw new Exception("Creditos necesarios no puede ser menor a 0"); }
+            }
         }
     }
 }

@@ -1,19 +1,18 @@
 ﻿using BibliotecaClases.BD;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BibliotecaClases.Interfaces
 {
-    public interface IABMPago : ISQLAddUpdateVista
+    public interface IRecibidorDeItemSeleccionado<T> where T : class
     {
 
-        public event Action<string>? AlSolicitarPago;
+        public List<T> ItemsAMostrar();
 
-        public void MostrarPago(Pago? pago);
+        public void RecibirItemSeleccionada(object item);
 
     }
 }

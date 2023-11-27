@@ -19,17 +19,17 @@ namespace BibliotecaClases.Logica
             _cursoVista.AlSolicitarCurso += MostrarCurso;
         }
 
-        public void MostrarCurso()
+        public void MostrarCurso(string cursoid)
         {
-            Curso? curso = Curso.ObtenerCursoPorID(_cursoVista.Curso.Id);
+            Curso? curso = Curso.ObtenerCursoPorID(cursoid);
             _cursoVista.MostrarCurso(curso);
         }
 
-        public void AddCurso(string nombre, string aula, string cupoMaximo)
+        public void AddCurso(string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
         {
             try
             {
-                ValidarCurso(nombre, aula, cupoMaximo);
+                ValidarCurso(nombre, aula, cupoMaximo, materiaId);
             } 
             catch (Exception ex)
             {
@@ -37,11 +37,15 @@ namespace BibliotecaClases.Logica
             }
 
             Int32.TryParse(cupoMaximo, out int intCupoMaximo);
-            Curso Curso = new Curso(nombre, aula, intCupoMaximo);
+
+            Curso curso = new Curso(nombre, aula, intCupoMaximo, profesorId);
+            MateriaCurso materiaCurso = new MateriaCurso(materiaId, curso.Id);
 
             try
             {
-                Curso.Add();
+                curso.Add();
+                materiaCurso.Add();
+                _cursoVista.OnAddOk();
             }
             catch (Exception ex)
             {
@@ -50,11 +54,11 @@ namespace BibliotecaClases.Logica
 
         }
 
-        public void UpdateCurso(string id, string nombre, string aula, string cupoMaximo)
+        public void UpdateCurso(string id, string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
         {
             try
             {
-                ValidarCurso(nombre, aula, cupoMaximo);
+                ValidarCurso(nombre, aula, cupoMaximo, materiaId);
             }
             catch (Exception ex)
             {
@@ -62,12 +66,14 @@ namespace BibliotecaClases.Logica
             }
 
             Int32.TryParse(cupoMaximo, out int intCupoMaximo);
-            Curso Curso = new Curso(nombre, aula, intCupoMaximo);
+
+            Curso Curso = new Curso(nombre, aula, intCupoMaximo, profesorId);
             Curso.Id = id;
 
             try
             {
                 Curso.Update();
+                _cursoVista.OnUpdateOk();
             }
             catch (Exception ex)
             {
@@ -75,11 +81,12 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        private void ValidarCurso(string nombre, string aula, string cupoMaximo)
+        private void ValidarCurso(string nombre, string aula, string cupoMaximo, string materiaId)
         {
             if (string.IsNullOrEmpty(nombre)) { throw new Exception("El nombre no puede estar vacio"); }
             if (string.IsNullOrEmpty(aula)) { throw new Exception("El aula no puede estar vacio"); }
             if (string.IsNullOrEmpty(cupoMaximo)) { throw new Exception("Cupo máximo no puede estar vacio"); }
+            if (string.IsNullOrEmpty(materiaId)) { throw new Exception("La materia no puede estar vacia"); }
             else
             {
                 bool cupoMaximoYry = int.TryParse(cupoMaximo, out int cupoMaximoResult);

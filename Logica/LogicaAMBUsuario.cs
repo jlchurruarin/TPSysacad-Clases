@@ -45,6 +45,7 @@ namespace BibliotecaClases.Logica
             try
             {
                 usuario.Add();
+                _usuarioVista.OnAddOk();
             }
             catch (Exception ex)
             {
@@ -63,10 +64,7 @@ namespace BibliotecaClases.Logica
                 }
 
                 _usuarioVista.OnAddError($"El {campo} ingresado ya se encuentra utilizado por otro usaurio");
-                return;
             }
-
-            _usuarioVista.OnAddOk();
 
         }
 

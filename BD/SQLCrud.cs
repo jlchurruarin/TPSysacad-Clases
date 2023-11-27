@@ -158,7 +158,7 @@ namespace BibliotecaClases.BD
 
         private protected string PrepareUpdateQuery()
         {
-            if (_set.Count == 0) throw new QueryNotSetValues("No se han configurado valores a modifucar");
+            if (_set.Count == 0) throw new QueryNotSetValues("No se han configurado valores a modificar");
             StringBuilder query = new StringBuilder();
             
             var set = string.Join(", ", _set.Select(x => $"{x.Key} = @s{x.Key}").ToArray());
@@ -176,7 +176,7 @@ namespace BibliotecaClases.BD
 
         private protected string PrepareDeleteQuery()
         {
-            if (_where == null) throw new QueryNotWhere("No se han agregado clausulas where");
+            if (_where == null) throw new QueryNotWhere("No se han agregado clausulas where. Se aborta DELETE ya que borraría toda la tabla");
 
             StringBuilder query = new StringBuilder();
 
@@ -229,17 +229,18 @@ namespace BibliotecaClases.BD
             else _comando.Parameters[$"@w{tableName}{columna}"].Value = DBNull.Value;
         }
 
-        private protected void AddSetValue(string columna, object valor)
+        private protected void AddSetValue(string columna, object? valor)
         {
             _set.Add(columna, valor);
             _comando.Parameters.Add($"@s{columna}", GetSqlDbType(columna));
-            if (valor.ToString() != "") _comando.Parameters[$"@s{columna}"].Value = valor;
+            if (valor is null) { _comando.Parameters[$"@s{columna}"].Value = DBNull.Value; }
+            else if (valor.ToString() != "") _comando.Parameters[$"@s{columna}"].Value = valor;
             else _comando.Parameters[$"@s{columna}"].Value = DBNull.Value;
         }
 
         private protected void AddJoin(string joinType, string externalTableName, string externalTableId, string tableId)
         {
-            _joins.Add($"{joinType} {externalTableName} ON {externalTableId} = {tableId}");
+            _joins.Add($"{joinType} {externalTableName} ON {externalTableName}.{externalTableId} = {_tableName}.{tableId}");
         }
 
         private void ClearQuery()

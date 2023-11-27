@@ -84,7 +84,15 @@ namespace BibliotecaClases.BD
 
         public override string ToString()
         {
-            return $"{Apellido}, {Nombre} - {CorreoElectronico}";
+            if (TipoDeUsuario == TipoDeUsuario.Estudiante)
+            {
+                return $"{Apellido}, {Nombre} - {CorreoElectronico} - Creditos Obtenidos: {this.GetCreditosObtenidos()}";
+            } 
+            else
+            {
+                return $"{Apellido}, {Nombre} - {CorreoElectronico}";
+            }
+            
         }
     }
 }

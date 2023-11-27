@@ -22,6 +22,11 @@ namespace BibliotecaClases.BD
             Monto = monto;
         }
 
+        public Pago(string estudianteId, ConceptoPago conceptoPago, EstadoPago estadoPago, decimal monto) : this(estudianteId, conceptoPago, monto)
+        {
+            EstadoDePago = estadoPago;
+        }
+
         public override string ToString()
         {
             string? conceptoPago = Enum.GetName(typeof(ConceptoPago), ConceptoDePago);

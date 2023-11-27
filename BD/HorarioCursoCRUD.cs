@@ -37,6 +37,7 @@ namespace BibliotecaClases.BD
         {
             AddWhereCondition("CursoID", Id);
             AddWhereCondition("Dia", (int) Dia);
+            AddWhereCondition("HoraInicio", HoraInicio);
 
             return base.Delete();
         }

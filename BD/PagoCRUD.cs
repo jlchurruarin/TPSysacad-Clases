@@ -10,7 +10,7 @@ namespace BibliotecaClases.BD
 {
     public partial class Pago : SQLCrud<Pago>, ICRUDOps<Pago>
     {
-        public string Id { get; }
+        public string Id { get; internal set; }
         public string EstudianteId { get; set; }
         public ConceptoPago ConceptoDePago { get; set; }
         public EstadoPago EstadoDePago { get; set; }
@@ -31,6 +31,7 @@ namespace BibliotecaClases.BD
             EstudianteId = estudianteId;
             ConceptoDePago = conceptoDePago;
             EstadoDePago = estadoDePago;
+            Monto = monto;
         }
 
         public Pago(string id, string estudianteId, ConceptoPago conceptoDePago, EstadoPago estadoDePago, MetodoPago? metodoDePago, decimal monto) : this(id, estudianteId, conceptoDePago, estadoDePago, monto)
@@ -95,10 +96,10 @@ namespace BibliotecaClases.BD
         public Pago Map(IDataRecord reader)
         {
             var pagoId = reader["PagoID"].ToString() ?? "";
-            var estudianteId = reader["CursoID"].ToString() ?? "";
+            var estudianteId = reader["EstudianteID"].ToString() ?? "";
             var conceptoDePago = (ConceptoPago) reader.GetByte(reader.GetOrdinal("ConceptoDePagoID"));
             var estadoDePago = (EstadoPago) reader.GetByte(reader.GetOrdinal("EstadoPagoID"));
-            var metodoDePago = (MetodoPago?) reader.GetByte(reader.GetOrdinal("MetodoPagoID"));
+            var metodoDePago = reader.IsDBNull(4) ? null : (MetodoPago?) reader.GetByte(reader.GetOrdinal("MetodoPagoID"));
             var monto = reader.GetDecimal(reader.GetOrdinal("Monto"));
 
             var curso = new Pago(pagoId, estudianteId, conceptoDePago, estadoDePago, metodoDePago, monto);
@@ -110,6 +111,7 @@ namespace BibliotecaClases.BD
         {
             return
             [
+                "PagoID",
                 "EstudianteID",
                 "ConceptoDePagoID",
                 "EstadoPagoID",

@@ -9,20 +9,23 @@ namespace BibliotecaClases.BD
     public partial class Curso
     {
 
-        private Curso() : this(Sistema.GenerarUUID(), string.Empty, string.Empty, 0)
+        private Curso() : this(Sistema.GenerarUUID(), string.Empty, string.Empty, 0, string.Empty)
         {
         }
 
-        public Curso(string nombreCursada, string aula, int cupoMaximo) : this()
+        public Curso(string nombreCursada, string aula, int cupoMaximo, string? profesorId) : this()
         {
             Nombre = nombreCursada;
             Aula = aula;
             CupoMaximo = cupoMaximo;
+            ProfesorId = profesorId;
         }
 
         public override string ToString()
         {
-            return $"Nombre Curso: {Nombre} - Aula: {Aula} - Cupo Maximo: {CupoMaximo}";
+            string cursoLleno = CursoLleno() ? "Si" : "No";
+            
+            return $"Nombre Curso: {Nombre} - Aula: {Aula} - Cupo Maximo: {CupoMaximo} - Curso Lleno: {cursoLleno}";
         }
 
         private bool CursoLleno()
@@ -30,34 +33,6 @@ namespace BibliotecaClases.BD
             if (GetCantidadIncriptos() < CupoMaximo) return false;
             else { return true; }
         }
-
-        public static bool operator +(Curso curso, Inscripcion inscripcion)
-        {
-            if (!curso.CursoLleno())
-            {
-                //TODO
-                /*
-                if (curso.GetIncriptos().Any(inscripcionTemporal => inscripcionTemporal.IdEstudiante == inscripcion.IdEstudiante))
-                {
-                    throw new Exception("El estudiante ya está inscripto en está materia");
-                }
-                else
-                {
-                    curso.ListaDeInscripciones.Add(inscripcion);
-                    return true;
-                }
-                */
-                return true;
-            }
-            else
-            {
-                /*
-                curso.ListaIdEstudiantesEnEspera.Add(inscripcion.IdEstudiante);
-                */
-                return false;
-            }
-        }
-
 
         public static bool operator ==(Curso cursoUno, Curso cursoDos)
         {

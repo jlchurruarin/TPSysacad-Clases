@@ -28,6 +28,14 @@ namespace BibliotecaClases.BD
             HoraFin = new DateTime(1753, 1, 1, horaFin.Hour, horaFin.Minute, horaFin.Second);
         }
 
+        public HorarioCurso(string cursoId, Dia dia, TimeOnly horaInicio, TimeOnly horaFin) : this()
+        {
+            Id = cursoId;
+            Dia = dia;
+            HoraInicio = new DateTime(1753, 1, 1, horaInicio.Hour, horaInicio.Minute, horaInicio.Second);
+            HoraFin = new DateTime(1753, 1, 1, horaFin.Hour, horaFin.Minute, horaFin.Second);
+        }
+
         public override string ToString()
         {
             return $"{Enum.GetName(typeof(Dia), Dia)} - {ObtenerHoraInicio()} a {ObtenerHoraFin()}";

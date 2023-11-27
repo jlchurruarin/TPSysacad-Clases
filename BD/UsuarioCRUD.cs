@@ -126,8 +126,10 @@ namespace BibliotecaClases.BD
             else { return null; }
         }
 
-        public static Usuario? ObtenerUsuarioPorID(TipoDeUsuario tipoDeUsuario, string usuarioID)
+        public static Usuario? ObtenerUsuarioPorID(TipoDeUsuario tipoDeUsuario, string? usuarioID)
         {
+            if (usuarioID is null) { return null; }
+
             Usuario usuario = new Usuario();
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("TipoUsuario", tipoDeUsuario);
@@ -141,10 +143,37 @@ namespace BibliotecaClases.BD
 
         public static List<Usuario> GetUsuariosInscriptos(Curso curso)
         {
+            List<Usuario> listaCursando = GetUsuarioPorEstadoDeInscripcion(curso, EstadoDeInscripcion.Cursando);
+            return listaCursando;
+        }
+
+        private static List<Usuario> GetUsuarioPorEstadoDeInscripcion(Curso curso, EstadoDeInscripcion estadoDeInscripcion)
+        {
             Usuario usuario = new Usuario();
-            usuario.AddJoin("INNER JOIN", "Inscripciones", "EstudianteID", "EstudianteID");
+            usuario.AddJoin("INNER JOIN", "Inscripciones", "EstudianteID", "UsuarioID");
             usuario.AddWhereCondition("Inscripciones", "CursoID", curso.Id);
+            usuario.AddWhereCondition("Inscripciones", "EstadoDeInscripcion", (int) estadoDeInscripcion);
             return usuario.InternalSearchWhere(usuario.Map, new Dictionary<string, object>());
+        }
+
+        public int GetCreditosObtenidos()
+        {
+            List<Curso> cursadasAprobados = Curso.GetCursosCursoAprobado(this);
+            List<Curso> finalesAprobados = Curso.GetCursosFinalAprobado(this);
+
+            List<Curso> listaCursosCreditos = new List<Curso>();
+            listaCursosCreditos.AddRange(cursadasAprobados);
+            listaCursosCreditos.AddRange(finalesAprobados);
+
+            int creditosTotales = 0;
+
+            foreach (Curso c in listaCursosCreditos)
+            {
+                Materia? m = Materia.ObtenerMateriaPorCursoID(c.Id);
+                if (m is not null) { creditosTotales += m.CreditosBrindados; }
+            }
+
+            return creditosTotales;
         }
 
         public Usuario Map(IDataRecord reader)

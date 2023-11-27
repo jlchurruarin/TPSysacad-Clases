@@ -10,19 +10,19 @@ namespace BibliotecaClases.BD
     public partial class Inscripcion
     {
 
-        private Inscripcion() : this(string.Empty, string.Empty, EstadoCursada.EnCurso, DateTime.Now)
+        private Inscripcion() : this(string.Empty, string.Empty, EstadoDeInscripcion.Cursando, DateTime.Now)
         {
             
         }
 
-        public Inscripcion(string estudianteId, string cursoId, EstadoCursada estadoDeInscripcion) : this()
+        public Inscripcion(string estudianteId, string cursoId, EstadoDeInscripcion estadoDeInscripcion) : this()
         {
             CursoId = cursoId;
             EstudianteId = estudianteId;
             EstadoDeInscripcion = estadoDeInscripcion;
         }
 
-        public Inscripcion(Usuario estudiante, Curso curso, EstadoCursada estadoDeInscripcion) : this(estudiante.Id, curso.Id, estadoDeInscripcion) { }
+        public Inscripcion(Usuario estudiante, Curso curso, EstadoDeInscripcion estadoDeInscripcion) : this(estudiante.Id, curso.Id, estadoDeInscripcion) { }
 
 
 
