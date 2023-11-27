@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Text.RegularExpressions;
 
 namespace BibliotecaClases
 {
@@ -15,9 +16,14 @@ namespace BibliotecaClases
     {
         static private string correoOrigen = "Sysacad@utn.com";
 
-        public static void EnviarCorreo(string destinatario, string titulo, string body)
+        public async static void EnviarCorreo(string destinatario, string titulo, string body)
         {
             //funcion que enviará correos.
+
+            string patronCorreo = @"^[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,4}$";
+            Regex rgCorreo = new Regex(patronCorreo);
+
+            if (!rgCorreo.IsMatch(destinatario)) { throw new Exception("Correo electronico del destinatario no valido"); }
 
             using (MailMessage mail = new MailMessage())
             {
@@ -33,7 +39,7 @@ namespace BibliotecaClases
                     smtp.Credentials = new NetworkCredential("tpsysacad@gmail.com", "qrcl tmum wiqh cfvd");
                     smtp.EnableSsl = true;
                     try { 
-                        smtp.Send(mail);
+                        smtp.SendAsync(mail, null);
                     } 
                     catch (Exception ex)
                     {

@@ -76,7 +76,14 @@ namespace BibliotecaClases.BD
 
             if (enviarCorreo)
             {
-                Correo.EnviarCorreo(CorreoElectronico, "Solicitud de nueva contraseña", $"Su nueva contraseña es: {nuevaContraseñaTextoPlano}");
+                try
+                {
+                    Correo.EnviarCorreo(CorreoElectronico, "Solicitud de nueva contraseña", $"Su nueva contraseña es: {nuevaContraseñaTextoPlano}");
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
             }
 
             return true;

@@ -49,11 +49,6 @@ namespace BibliotecaClases
             return stringUUID;
         }
 
-        public static bool VerificarDisponibilidadHoraria(Usuario estudiante, Curso curso)
-        {
-            return true;
-        }
-
         public static string EncriptarTexto(string texto)
         {
             return BCrypt.Net.BCrypt.EnhancedHashPassword(texto, 9);

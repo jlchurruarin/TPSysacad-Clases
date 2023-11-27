@@ -21,7 +21,7 @@ namespace BibliotecaClases.BD
         {
             get
             {
-                return $"DisplayText: {ToString()}";
+                return $"{ToString()}";
             }
         }
 
