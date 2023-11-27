@@ -16,7 +16,7 @@ namespace BibliotecaClases
     {
         static private string correoOrigen = "Sysacad@utn.com";
 
-        public async static void EnviarCorreo(string destinatario, string titulo, string body)
+        public static void EnviarCorreo(string destinatario, string titulo, string body)
         {
             //funcion que enviará correos.
 
@@ -39,7 +39,7 @@ namespace BibliotecaClases
                     smtp.Credentials = new NetworkCredential("tpsysacad@gmail.com", "qrcl tmum wiqh cfvd");
                     smtp.EnableSsl = true;
                     try { 
-                        smtp.SendAsync(mail, null);
+                        smtp.Send(mail);
                     } 
                     catch (Exception ex)
                     {
