@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -55,7 +56,7 @@ namespace BibliotecaClases.Logica
 
         public async void EliminarEstudiante(Usuario usuario)
         {
-            if (usuario.TipoDeUsuario != TipoDeUsuario.Estudiante) { throw new Exception("Error al borrar el estudiante seleccionado."); }
+            if (usuario.TipoDeUsuario != TipoDeUsuario.Estudiante) { throw new TipoDeUsuarioErroneoException("Error al borrar el estudiante seleccionado."); }
 
             try
             {
@@ -67,7 +68,7 @@ namespace BibliotecaClases.Logica
 
         public async void EliminarProfesor(Usuario usuario)
         {
-            if (usuario.TipoDeUsuario != TipoDeUsuario.Profesor) { throw new Exception("Error al borrar el profesor seleccionado."); }
+            if (usuario.TipoDeUsuario != TipoDeUsuario.Profesor) { throw new TipoDeUsuarioErroneoException("Error al borrar el profesor seleccionado."); }
 
             try
             {
@@ -79,7 +80,7 @@ namespace BibliotecaClases.Logica
 
         public async void EliminarAdministrador(Usuario usuario)
         {
-            if (usuario.TipoDeUsuario != TipoDeUsuario.Administrador) { throw new Exception("Error al borrar el administrador seleccionado."); }
+            if (usuario.TipoDeUsuario != TipoDeUsuario.Administrador) { throw new TipoDeUsuarioErroneoException("Error al borrar el administrador seleccionado."); }
 
             try
             {
@@ -174,6 +175,26 @@ namespace BibliotecaClases.Logica
             }
 
             return informePagos;
+        }
+    }
+
+    [Serializable]
+    public class TipoDeUsuarioErroneoException : Exception
+    {
+        public TipoDeUsuarioErroneoException()
+        {
+        }
+
+        public TipoDeUsuarioErroneoException(string? message) : base(message)
+        {
+        }
+
+        public TipoDeUsuarioErroneoException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected TipoDeUsuarioErroneoException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }

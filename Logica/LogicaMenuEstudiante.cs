@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,9 +94,49 @@ namespace BibliotecaClases.Logica
 
         public void ValidarInscripcion(string estudianteId, string cursoId, DateTime fechaDeInscripcion)
         {
-            if (string.IsNullOrEmpty(estudianteId)) { throw new Exception("Estudiante no valido"); }
-            if (string.IsNullOrEmpty(cursoId)) { throw new Exception("Curso no valido"); }
+            if (string.IsNullOrEmpty(estudianteId)) { throw new EstudianteNoValidoException("Estudiante no valido"); }
+            if (string.IsNullOrEmpty(cursoId)) { throw new CursoNoValidoException("Curso no valido"); }
 
+        }
+    }
+
+    [Serializable]
+    public class CursoNoValidoException : Exception
+    {
+        public CursoNoValidoException()
+        {
+        }
+
+        public CursoNoValidoException(string? message) : base(message)
+        {
+        }
+
+        public CursoNoValidoException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected CursoNoValidoException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
+    [Serializable]
+    public class EstudianteNoValidoException : Exception
+    {
+        public EstudianteNoValidoException()
+        {
+        }
+
+        public EstudianteNoValidoException(string? message) : base(message)
+        {
+        }
+
+        public EstudianteNoValidoException(string? message, Exception? innerException) : base(message, innerException)
+        {
+        }
+
+        protected EstudianteNoValidoException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
         }
     }
 }
