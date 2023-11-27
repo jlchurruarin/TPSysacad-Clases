@@ -36,24 +36,24 @@ namespace BibliotecaClases.BD
             CreditosNecesarios = creditosNecesarios;
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("MateriaID", Id);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Descripcion", Descripcion);
             AddSetValue("CreditosBrindados", CreditosBrindados);
             AddSetValue("CreditosNecesarios", CreditosNecesarios);
-            return base.Add();
+            return await base.Add();
         }
 
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("MateriaID", Id);
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public new int Update()
+        public new async Task<int> Update()
         {
             AddSetValue("Nombre", Nombre);
             AddSetValue("Descripcion", Descripcion);
@@ -62,50 +62,50 @@ namespace BibliotecaClases.BD
 
             AddWhereCondition("MateriaID", Id);
 
-            return base.Update();
+            return await base.Update();
         }
 
-        public static Materia? ObtenerMateriaPorID(string id)
+        public static async Task<Materia?> ObtenerMateriaPorID(string id)
         {
             Materia materia = new Materia();
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("MateriaID", id);
-            List<Materia> materias = materia.InternalSearchWhere(materia.Map, where);
+            List<Materia> materias = await materia.InternalSearchWhere(materia.Map, where);
 
             if (materias.Count == 0) return null;
 
             return materias[0];
         }
 
-        public static Materia? ObtenerMateriaPorCursoID(string id)
+        public static async Task<Materia?> ObtenerMateriaPorCursoID(string id)
         {
             Materia materia = new Materia();
             materia.AddJoin("INNER JOIN", "MateriaCurso", "MateriaID", "MateriaID");
             materia.AddWhereCondition("MateriaCurso", "CursoID", id);
-            List<Materia> materias = materia.InternalSearchWhere(materia.Map, new Dictionary<string, object>());
+            List<Materia> materias = await materia.InternalSearchWhere(materia.Map, new Dictionary<string, object>());
 
             if (materias.Count == 0) return null;
 
             return materias[0];
         }
 
-        public static List<Materia> GetAll()
+        public static async Task<List<Materia>> GetAll()
         {
             Materia mat = new Materia();
-            return mat.InternalGetAll(mat.Map);
+            return await mat.InternalGetAll(mat.Map);
         }
 
-        public List<Materia> GetMateriasRequeridas()
+        public async Task<List<Materia>> GetMateriasRequeridas()
         {
             AddJoin("INNER JOIN", "RequisitosMaterias", "MateriaID", "RequisitoMateriaID");
             AddWhereCondition("RequisitosMaterias", "MateriaID", Id);
-            return InternalSearchWhere(Map, new Dictionary<string, object>());
+            return await InternalSearchWhere(Map, new Dictionary<string, object>());
         }
 
-        public static List<Materia> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<Materia>> SearchWhere(Dictionary<string, object> campoValores)
         {
             Materia mat = new Materia();
-            return mat.InternalSearchWhere(mat.Map, campoValores);
+            return await mat.InternalSearchWhere(mat.Map, campoValores);
         }
 
         public Materia Map(IDataRecord reader)

@@ -18,12 +18,12 @@ namespace BibliotecaClases.Logica
             _gestionHorariosVista.AlSolicitarHorarios += ObtenerHorariosCurso;
         }
 
-        public List<HorarioCurso> ObtenerHorariosCurso(Curso curso)
+        public async Task<List<HorarioCurso>> ObtenerHorariosCurso(Curso curso)
         {
-            return HorarioCurso.GetHorarioCursos(curso);
+            return await HorarioCurso.GetHorarioCursos(curso);
         }
 
-        public void AgregarHorario(string cursoId, Dia dia, TimeOnly horaInicio, TimeOnly horaFin)
+        public async void AgregarHorario(string cursoId, Dia dia, TimeOnly horaInicio, TimeOnly horaFin)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace BibliotecaClases.Logica
             try
             {
                 HorarioCurso hc = new HorarioCurso(cursoId, dia, horaInicio, horaFin);
-                hc.Add();
+                await hc.Add();
                 _gestionHorariosVista.OnAddOk();
             }
             catch (Exception ex)
@@ -46,11 +46,11 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        public void EliminarHorario(HorarioCurso horarioCurso)
+        public async void EliminarHorario(HorarioCurso horarioCurso)
         {
             try
             {
-                horarioCurso.Delete();
+                await horarioCurso.Delete();
                 _gestionHorariosVista.OnRemoveOk();
             }
             catch (Exception ex)

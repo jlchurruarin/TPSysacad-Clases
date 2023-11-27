@@ -21,13 +21,13 @@ namespace BibliotecaClases.BD
             _comando.Connection = _conexion;
         }
 
-        public List<T> ExecuteReader(string query, Func<IDataRecord, T> mapeo)
+        public async Task<List<T>> ExecuteReader(string query, Func<IDataRecord, T> mapeo)
         {
             var lista = new List<T>();
 
             try
             {
-                _conexion.Open();
+                await _conexion.OpenAsync();
 
                 _comando.CommandText = query;
 
@@ -50,15 +50,15 @@ namespace BibliotecaClases.BD
             }
             finally
             {
-                _conexion.Close();
+                await _conexion.CloseAsync();
             }
         }
 
-        protected int ExecuteNonQuery()
+        protected async Task<int> ExecuteNonQuery()
         {
             try
             {
-                _conexion.Open();
+                await _conexion.OpenAsync();
 
                 var filasAfectadas = _comando.ExecuteNonQuery();
 
@@ -71,7 +71,7 @@ namespace BibliotecaClases.BD
             }
             finally
             {
-                _conexion.Close();
+                await _conexion.CloseAsync();
             }
         }
     }

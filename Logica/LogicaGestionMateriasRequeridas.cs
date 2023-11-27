@@ -13,29 +13,29 @@ namespace BibliotecaClases.Logica
             _gestionMateriasRequeridasVista.AlSolicitarMateria += ObtenerMateriasRequeridas;
         }
 
-        public List<Materia> ObtenerMateriasRequeridas(Materia materia)
+        public async Task<List<Materia>> ObtenerMateriasRequeridas(Materia materia)
         {
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("MateriaID", materia.Id);
-            List<RequisitoMateria> listaRequisitos = RequisitoMateria.SearchWhere(where);
+            List<RequisitoMateria> listaRequisitos = await RequisitoMateria.SearchWhere(where);
 
             List<Materia> materiasRequeridas = new List<Materia>();
 
             foreach(RequisitoMateria rm in listaRequisitos)
             {
-                Materia? m = Materia.ObtenerMateriaPorID(rm.MateriaRequeridaId);
+                Materia? m = await Materia.ObtenerMateriaPorID(rm.MateriaRequeridaId);
                 if (m is not null ) { materiasRequeridas.Add(m); }
             }
 
             return materiasRequeridas;
         }
 
-        public List<Materia> ObtenerMateriasRequeridasPosibles(Materia materia)
+        public async Task<List<Materia>> ObtenerMateriasRequeridasPosibles(Materia materia)
         {
-            List<Materia> listaMaterias = Materia.GetAll();
+            List<Materia> listaMaterias = await Materia.GetAll();
             listaMaterias.RemoveAll(item => item.Id == materia.Id);
 
-            List<Materia> materiasRequeridasActuales = ObtenerMateriasRequeridas(materia);
+            List<Materia> materiasRequeridasActuales = await ObtenerMateriasRequeridas(materia);
 
             foreach(Materia m in materiasRequeridasActuales)
             {
@@ -46,7 +46,7 @@ namespace BibliotecaClases.Logica
         }
 
 
-        public void AgregarMateriaRequerida(Materia materia, Materia materiaRequerida)
+        public async void AgregarMateriaRequerida(Materia materia, Materia materiaRequerida)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace BibliotecaClases.Logica
             try
             {
                 RequisitoMateria rm = new RequisitoMateria(materia, materiaRequerida);
-                rm.Add();
+                await rm.Add();
                 _gestionMateriasRequeridasVista.OnAddOk();
             }
             catch (Exception ex)
@@ -69,7 +69,7 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        public void EliminarMateriaRequerida(Materia materia, Materia materiaRequerida)
+        public async void EliminarMateriaRequerida(Materia materia, Materia materiaRequerida)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace BibliotecaClases.Logica
             try
             {
                 RequisitoMateria rm = new RequisitoMateria(materia, materiaRequerida);
-                rm.Delete();
+                await rm.Delete();
                 _gestionMateriasRequeridasVista.OnRemoveOk();
             } 
             catch (Exception ex)

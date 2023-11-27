@@ -17,7 +17,7 @@ namespace BibliotecaClases.Logica
             _gestionPagoVista.AlSolicitarPagos += ObtenerPagos;
         }
 
-        public void EliminarPago(object pago)
+        public async void EliminarPago(object pago)
         {
             Pago? pagoAEliminar = pago as Pago;
 
@@ -26,7 +26,7 @@ namespace BibliotecaClases.Logica
             else
             {
                 try { 
-                    pagoAEliminar.Delete();
+                    await pagoAEliminar.Delete();
                     _gestionPagoVista.OnRemoveOk();
                 }
                 catch (Exception ex)
@@ -36,11 +36,11 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        public List<Pago> ObtenerPagos(Usuario estudiante)
+        public async Task<List<Pago>> ObtenerPagos(Usuario estudiante)
         {
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("EstudianteID", estudiante.Id);
-            return Pago.SearchWhere(where);
+            return await Pago.SearchWhere(where);
         }
     }
 }

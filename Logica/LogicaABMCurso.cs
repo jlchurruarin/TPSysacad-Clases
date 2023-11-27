@@ -19,13 +19,13 @@ namespace BibliotecaClases.Logica
             _cursoVista.AlSolicitarCurso += MostrarCurso;
         }
 
-        public void MostrarCurso(string cursoid)
+        public async void MostrarCurso(string cursoid)
         {
-            Curso? curso = Curso.ObtenerCursoPorID(cursoid);
+            Curso? curso = await Curso.ObtenerCursoPorID(cursoid);
             _cursoVista.MostrarCurso(curso);
         }
 
-        public void AddCurso(string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
+        public async void AddCurso(string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
         {
             try
             {
@@ -43,8 +43,8 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                curso.Add();
-                materiaCurso.Add();
+                await curso.Add();
+                await materiaCurso.Add();
                 _cursoVista.OnAddOk();
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace BibliotecaClases.Logica
 
         }
 
-        public void UpdateCurso(string id, string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
+        public async void UpdateCurso(string id, string nombre, string aula, string cupoMaximo, string materiaId, string? profesorId)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                Curso.Update();
+                await Curso.Update();
                 _cursoVista.OnUpdateOk();
             }
             catch (Exception ex)

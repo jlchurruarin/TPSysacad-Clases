@@ -23,14 +23,14 @@ namespace BibliotecaClases.BD
 
         public override string ToString()
         {
-            string cursoLleno = CursoLleno() ? "Si" : "No";
+            string cursoLleno = CursoLleno().Result ? "Si" : "No";
             
             return $"Nombre Curso: {Nombre} - Aula: {Aula} - Cupo Maximo: {CupoMaximo} - Curso Lleno: {cursoLleno}";
         }
 
-        private bool CursoLleno()
+        private async Task<bool> CursoLleno()
         {
-            if (GetCantidadIncriptos() < CupoMaximo) return false;
+            if (await GetCantidadIncriptos() < CupoMaximo) return false;
             else { return true; }
         }
 

@@ -9,7 +9,7 @@ namespace BibliotecaClases.Interfaces
 {
     public interface IGestionHorarios : ISQLAddUpdateVista
     {
-        public event Func<Curso, List<HorarioCurso>>? AlSolicitarHorarios;
+        public event Func<Curso, Task<List<HorarioCurso>>>? AlSolicitarHorarios;
 
         public void MostrarListaHorarios(List<HorarioCurso> listaHorarios);
         public void OnRemoveOk();

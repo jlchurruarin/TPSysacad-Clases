@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -24,25 +25,25 @@ namespace BibliotecaClases.BD
             HoraFin = new DateTime(1753 , 1, 1, horaFin.Hour, horaFin.Minute, horaFin.Second);
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("CursoID", Id);
             AddSetValue("Dia", (int) Dia);
             AddSetValue("HoraInicio", HoraInicio);
             AddSetValue("HoraFin", HoraFin);
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("CursoID", Id);
             AddWhereCondition("Dia", (int) Dia);
             AddWhereCondition("HoraInicio", HoraInicio);
 
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public new int Update()
+        public new async Task<int> Update()
         {
             AddSetValue("HoraInicio", HoraInicio);
             AddSetValue("HoraFin", HoraFin);
@@ -50,26 +51,67 @@ namespace BibliotecaClases.BD
             AddWhereCondition("CursoID", Id);
             AddWhereCondition("Dia", Dia);
 
-            return base.Update();
+            return await base.Update();
         }
 
-        public static List<HorarioCurso> GetAll()
+        public static async Task<List<HorarioCurso>> GetAll()
         {
             HorarioCurso hc = new HorarioCurso();
-            return hc.InternalGetAll(hc.Map);
+            return await hc.InternalGetAll(hc.Map);
         }
 
-        public static List<HorarioCurso> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<HorarioCurso>> SearchWhere(Dictionary<string, object> campoValores)
         {
             HorarioCurso hc = new HorarioCurso();
-            return hc.InternalSearchWhere(hc.Map, campoValores);
+            return await hc.InternalSearchWhere(hc.Map, campoValores);
         }
 
-        public static List<HorarioCurso> GetHorarioCursos(Curso curso)
+        public static async Task<List<HorarioCurso>> GetHorarioCursos(Curso curso)
         {
             Dictionary<string, object> search = new Dictionary<string, object>();
             search.Add("CursoID", curso.Id);
-            return SearchWhere(search);
+            return await SearchWhere(search);
+        }
+
+        public static async Task<List<object>> GetCalendarioEstudiante(Usuario estudiante)
+        {
+            List<Curso> cursos = await Curso.GetCursosEnCurso(estudiante);
+            
+            List<object> lista = new List<object>();
+
+            foreach (Curso curso in cursos)
+            {
+                List<HorarioCurso> horariosCurso = await GetHorarioCursos(curso);
+
+                if (horariosCurso.Count == 0 )
+                {
+                    var obj = new
+                    {
+                        Dia = "Día no definido",
+                        Curso = curso.Nombre,
+                        Desde = "Horario no definido",
+                        Hasta = "Horario no definido",
+                    };
+
+                    lista.Add(obj);
+                }
+                else { 
+                    foreach (HorarioCurso hc in horariosCurso) 
+                    {
+                        var obj = new
+                        {
+                            Dia = Enum.GetName(typeof(Dia), hc.Dia),
+                            Curso = curso.Nombre,
+                            Desde = hc.HoraInicio,
+                            Hasta = hc.HoraFin,
+                        };
+
+                        lista.Add(obj);
+                    }
+                }
+            }
+
+            return lista;
         }
 
         public HorarioCurso Map(IDataRecord reader)

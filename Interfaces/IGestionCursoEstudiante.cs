@@ -10,7 +10,7 @@ namespace BibliotecaClases.Interfaces
     public interface IGestionCursoEstudiante
     {
 
-        public event Func<Usuario, List<Curso>>? AlSolicitarCursos;
+        public event Func<Usuario, Task<List<Curso>>>? AlSolicitarCursos;
 
         public void MostrarListaCursos(List<Curso> listaCursos);
         public void OnRemoveOk();

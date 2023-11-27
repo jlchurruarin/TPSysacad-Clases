@@ -19,14 +19,13 @@ namespace BibliotecaClases.Logica
             _materiaVista.AlSolicitarMateria += MostrarMateria;
         }
 
-        public void MostrarMateria()
+        public async void MostrarMateria()
         {
-            //Usuario? usuario = Usuario.ObtenerUsuarioPorID(_usuarioVista.TipoDeUsuario, _usuarioVista.Usuario.Id);
-            Materia? materia = Materia.ObtenerMateriaPorID(_materiaVista.Materia.Id);
+            Materia? materia = await Materia.ObtenerMateriaPorID(_materiaVista.Materia.Id);
             _materiaVista.MostrarMateria(materia);
         }
 
-        public void AddMateria(string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
+        public async void AddMateria(string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
         {
             try
             {
@@ -45,7 +44,7 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                materia.Add();
+                await materia.Add();
                 _materiaVista.OnAddOk();
             }
             catch (Exception ex)
@@ -55,7 +54,7 @@ namespace BibliotecaClases.Logica
         }
 
 
-        public void UpdateMateria(string id, string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
+        public async void UpdateMateria(string id, string nombre, string descripcion, string creditosBrindados, string creditosNecesarios)
         {
             try
             {
@@ -75,7 +74,7 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                materia.Update();
+                await materia.Update();
                 _materiaVista.OnUpdateOk();
             }
             catch (Exception ex)

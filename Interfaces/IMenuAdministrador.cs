@@ -9,11 +9,11 @@ namespace BibliotecaClases.Interfaces
 {
     public interface IMenuAdministrador
     {
-        public event Action? AlSolicitarEstudiantes;
-        public event Action? AlSolicitarProfesores;
-        public event Action? AlSolicitarAdministradores;
-        public event Action? AlSolicitarMaterias;
-        public event Action? AlSolicitarCursos;
+        public event Func<Task>? AlSolicitarEstudiantes;
+        public event Func<Task>? AlSolicitarProfesores;
+        public event Func<Task>? AlSolicitarAdministradores;
+        public event Func<Task>? AlSolicitarMaterias;
+        public event Func<Task>? AlSolicitarCursos;
 
         public void MostrarListaEstudiantes(List<Usuario> listaEstudiantes);
         public void MostrarListaProfesores(List<Usuario> listaEstudiantes);

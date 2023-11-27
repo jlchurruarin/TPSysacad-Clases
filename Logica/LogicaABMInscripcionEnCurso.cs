@@ -19,20 +19,20 @@ namespace BibliotecaClases.Logica
             _vistaInscripcion.AlSolicitarCursosDisponibles += MostrarCursos;
         }
 
-        public List<Curso> MostrarCursos(Usuario estudiante)
+        public async Task<List<Curso>> MostrarCursos(Usuario estudiante)
         {
-            List<Curso> cursosInscriptos = Curso.GetCursosInscripto(estudiante);
+            List<Curso> cursosInscriptos = await Curso.GetCursosInscripto(estudiante);
             
             List<Materia> materiasInscriptas = new List<Materia>();
 
             foreach(Curso curso in  cursosInscriptos)
             {
-                Materia? materia = Materia.ObtenerMateriaPorCursoID(curso.Id);
+                Materia? materia = await Materia.ObtenerMateriaPorCursoID(curso.Id);
                 if (materia is not null) { materiasInscriptas.Add(materia); }
             }
 
-            List<Materia> todasLasMaterias = Materia.GetAll();
-            int creditosDelEstudiante = estudiante.GetCreditosObtenidos();
+            List<Materia> todasLasMaterias = await Materia.GetAll();
+            int creditosDelEstudiante = await estudiante.GetCreditosObtenidos();
 
             foreach (Materia m in materiasInscriptas)
             {
@@ -47,11 +47,11 @@ namespace BibliotecaClases.Logica
 
                 Dictionary<string, object> where = new Dictionary<string, object>();
                 where.Add("MateriaID", m.Id);
-                List<RequisitoMateria> requisitoMateria = RequisitoMateria.SearchWhere(where);
+                List<RequisitoMateria> requisitoMateria = await RequisitoMateria.SearchWhere(where);
 
                 if (requisitoMateria.All(rm => materiasInscriptas.Any(mi => rm.MateriaRequeridaId == mi.Id)))
                 {
-                    List<Curso> listaCursos = Curso.ObtenerCursosPorIDMateria(m.Id);
+                    List<Curso> listaCursos = await Curso.ObtenerCursosPorIDMateria(m.Id);
                     cursosDisponibles.AddRange(listaCursos);
                 }
             }
@@ -59,7 +59,7 @@ namespace BibliotecaClases.Logica
             return cursosDisponibles;
         }
 
-        public void AgregarInscripcion(string estudianteId, string cursoId)
+        public async void AgregarInscripcion(string estudianteId, string cursoId)
         {
             try
             {
@@ -73,19 +73,19 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                Curso? curso = Curso.ObtenerCursoPorID(cursoId);
+                Curso? curso = await Curso.ObtenerCursoPorID(cursoId);
 
                 if (curso is not null)
                 {
-                    if (curso.CupoMaximo > curso.GetCantidadIncriptos())
+                    if (curso.CupoMaximo > await curso.GetCantidadIncriptos())
                     {
                         Inscripcion inscripcion = new Inscripcion(estudianteId, cursoId, EstadoDeInscripcion.Cursando);
-                        inscripcion.Add();
+                        await inscripcion.Add();
                     } 
                     else
                     {
                         Inscripcion inscripcion = new Inscripcion(estudianteId, cursoId, EstadoDeInscripcion.EnListaDeEspera);
-                        inscripcion.Add();
+                        await inscripcion.Add();
                     }
                     
                 }

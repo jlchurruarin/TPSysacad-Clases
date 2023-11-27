@@ -10,7 +10,7 @@ namespace BibliotecaClases.Interfaces
     public interface IGestionPagoEstudiante
     {
 
-        public event Func<Usuario, List<Pago>>? AlSolicitarPagos;
+        public event Func<Usuario, Task<List<Pago>>>? AlSolicitarPagos;
 
         public void MostrarListaPagos(List<Pago> listaPagos);
         public void OnRemoveOk();

@@ -18,14 +18,14 @@ namespace BibliotecaClases.Logica
             _inscripcionVista.AlSolicitarInscripcion += ObtenerInscripcion;
         }
 
-        private void ObtenerInscripcion(Curso curso, Usuario estudiante) 
+        private async void ObtenerInscripcion(Curso curso, Usuario estudiante) 
         {
-            Inscripcion? inscripcion = Inscripcion.GetInscripcion(curso.Id, estudiante.Id);
+            Inscripcion? inscripcion = await Inscripcion.GetInscripcion(curso.Id, estudiante.Id);
 
             if (inscripcion is not null ) { _inscripcionVista.MostrarInscripcion(inscripcion); }
         }
 
-        public void AgregarInscripcion(string estudianteId, string cursoId, string estadoDeInscripcion, DateTime fechaDeInscripcion)
+        public async void AgregarInscripcion(string estudianteId, string cursoId, string estadoDeInscripcion, DateTime fechaDeInscripcion)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace BibliotecaClases.Logica
                 Enum.TryParse(typeof(EstadoDeInscripcion), estadoDeInscripcion, out object? objEstadoDeInscripcion);
                 EstadoDeInscripcion enumEstadoDeInscripcion = (EstadoDeInscripcion)objEstadoDeInscripcion;
                 Inscripcion inscripcion = new Inscripcion(estudianteId, cursoId, enumEstadoDeInscripcion, fechaDeInscripcion);
-                inscripcion.Add();
+                await inscripcion.Add();
                 _inscripcionVista.OnAddOk();
             }
             catch (Exception ex)
@@ -59,7 +59,7 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        public void ModificarInscripcion(string estudianteId, string cursoId, string estadoDeInscripcion, DateTime fechaDeInscripcion)
+        public async void ModificarInscripcion(string estudianteId, string cursoId, string estadoDeInscripcion, DateTime fechaDeInscripcion)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace BibliotecaClases.Logica
                 Enum.TryParse(typeof(EstadoDeInscripcion), estadoDeInscripcion, out object? objEstadoDeInscripcion);
                 EstadoDeInscripcion enumEstadoDeInscripcion = (EstadoDeInscripcion)objEstadoDeInscripcion;
                 Inscripcion inscripcion = new Inscripcion(estudianteId, cursoId, enumEstadoDeInscripcion, fechaDeInscripcion);
-                inscripcion.Update();
+                await inscripcion.Update();
                 _inscripcionVista.OnUpdateOk();
             }
             catch (Exception ex)

@@ -86,7 +86,7 @@ namespace BibliotecaClases.BD
         {
             if (TipoDeUsuario == TipoDeUsuario.Estudiante)
             {
-                return $"{Apellido}, {Nombre} - {CorreoElectronico} - Creditos Obtenidos: {this.GetCreditosObtenidos()}";
+                return $"{Apellido}, {Nombre} - {CorreoElectronico} - Creditos Obtenidos: {GetCreditosObtenidos().Result}";
             } 
             else
             {

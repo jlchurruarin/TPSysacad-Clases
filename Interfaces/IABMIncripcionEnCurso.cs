@@ -9,7 +9,7 @@ namespace BibliotecaClases.Interfaces
 {
     public interface IABMIncripcionEnCurso
     {
-        public event Func<Usuario, List<Curso>>? AlSolicitarCursosDisponibles;
+        public event Func<Usuario, Task<List<Curso>>>? AlSolicitarCursosDisponibles;
 
         public void MostrarListaCursosDisponibles(List<Curso> listaCursos);
 

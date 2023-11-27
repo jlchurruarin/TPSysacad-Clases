@@ -50,34 +50,34 @@ namespace BibliotecaClases.BD
         }
     }
 
-
     public abstract class SQLCrud<T> : SQLDB<T> where T : class
     {
         private readonly string _tableName;
         private Dictionary<string, object> _where = new Dictionary<string, object>();
+        private Dictionary<string, TipoWhere> _whereType = new Dictionary<string, TipoWhere>();
         private Dictionary<string, object> _set = new Dictionary<string, object>();
         private List<string> _columns = new List<string>();
         private List<string> _joins = new List<string>();
 
 
-        public SQLCrud(string tableName)
+        public SQLCrud(string tableName) : base()
         {
             _tableName = tableName;
         }
 
-        internal List<T> InternalGetAll(Func<IDataRecord, T> mapeo)
+        internal async Task<List<T>> InternalGetAll(Func<IDataRecord, T> mapeo)
         {
             AddColums(ObtenerListaColumnasBD());
 
             var query = PrepareSelectQuery();
             _comando.CommandText = query;
 
-            List<T> resultado = ExecuteReader(query, mapeo);
+            List<T> resultado = await ExecuteReader(query, mapeo);
             ClearQuery();
             return resultado;
         }
 
-        internal List<T> InternalSearchWhere(Func<IDataRecord, T> mapeo, Dictionary<string, object> campoValores)
+        internal async Task<List<T>> InternalSearchWhere(Func<IDataRecord, T> mapeo, Dictionary<string, object> campoValores)
         {
             AddColums(ObtenerListaColumnasBD());
 
@@ -89,31 +89,31 @@ namespace BibliotecaClases.BD
             var query = PrepareSelectQuery();
             _comando.CommandText = query;
 
-            List<T> result = ExecuteReader(query, mapeo);
+            List<T> result = await ExecuteReader(query, mapeo);
             ClearQuery();
             return result;
         }
 
-        public int Add()
+        public async Task<int> Add()
         {
             _comando.CommandText = PrepareInsertQuery();
-            int result = ExecuteNonQuery();
+            int result = await ExecuteNonQuery();
             ClearQuery();
             return result;
         }
 
-        public int Delete()
+        public async Task<int> Delete()
         {
             _comando.CommandText = PrepareDeleteQuery();
-            int result = ExecuteNonQuery();
+            int result = await ExecuteNonQuery();
             ClearQuery();
             return result;
         }
 
-        public int Update()
+        public async Task<int> Update()
         {
             _comando.CommandText = PrepareUpdateQuery();
-            int result = ExecuteNonQuery();
+            int result = await ExecuteNonQuery();
             ClearQuery();
             return result;
         }
@@ -136,7 +136,7 @@ namespace BibliotecaClases.BD
 
             if (_where.Count > 0)
             {
-                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} {ConvertiraStringTipoWhere(_whereType[x.Key])} @w{x.Value}").ToArray());
                 query.Append($" WHERE {where}");
             }
 
@@ -167,7 +167,7 @@ namespace BibliotecaClases.BD
 
             if (_where != null)
             {
-                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
+                var where = string.Join(" AND ", _where.Select(x => $"{x.Key} {ConvertiraStringTipoWhere(_whereType[x.Key])} @w{x.Value}").ToArray());
                 query.Append($" WHERE {where}");
             }
 
@@ -180,7 +180,7 @@ namespace BibliotecaClases.BD
 
             StringBuilder query = new StringBuilder();
 
-            var where = string.Join(" AND ", _where.Select(x => $"{x.Key} = @w{x.Value}").ToArray());
+            var where = string.Join(" AND ", _where.Select(x => $"{x.Key} {ConvertiraStringTipoWhere(_whereType[x.Key])} @w{x.Value}").ToArray());
 
             query.AppendFormat("DELETE FROM {0} WHERE {1}", _tableName, where);
 
@@ -215,15 +215,27 @@ namespace BibliotecaClases.BD
 
         private protected void AddWhereCondition(string columna, object? valor)
         {
+            AddWhereCondition(columna, TipoWhere.Igual, valor);
+        }
+
+        private protected void AddWhereCondition(string columna, TipoWhere condicion, object? valor)
+        {
             _where.Add(columna, columna);
+            _whereType.Add(columna, condicion);
             _comando.Parameters.Add($"@w{columna}", GetSqlDbType(columna));
-            if (valor != null ) _comando.Parameters[$"@w{columna}"].Value = valor;
+            if (valor != null) _comando.Parameters[$"@w{columna}"].Value = valor;
             else _comando.Parameters[$"@w{columna}"].Value = DBNull.Value;
         }
 
         private protected void AddWhereCondition(string tableName, string columna, object? valor)
         {
+            AddWhereCondition(tableName, columna, TipoWhere.Igual, valor);
+        }
+
+        private protected void AddWhereCondition(string tableName, string columna, TipoWhere condicion, object? valor)
+        {
             _where.Add($"{tableName}.{columna}", $"{tableName}{columna}");
+            _whereType.Add($"{tableName}.{columna}", condicion);
             _comando.Parameters.Add($"@w{tableName}{columna}", GetSqlDbType(columna));
             if (valor != null) _comando.Parameters[$"@w{tableName}{columna}"].Value = valor;
             else _comando.Parameters[$"@w{tableName}{columna}"].Value = DBNull.Value;
@@ -258,6 +270,23 @@ namespace BibliotecaClases.BD
         }
 
         protected abstract string[] ObtenerListaColumnasBD();
+
+        private string ConvertiraStringTipoWhere(TipoWhere where)
+        {
+            string retorno = null;
+
+            if (where == TipoWhere.Igual) { retorno = "="; }
+            else if (where == TipoWhere.Distinto) { retorno = "!="; }
+            else if (where == TipoWhere.Mayor) { retorno = ">"; }
+            else if (where == TipoWhere.MayorIgual) { retorno = ">="; }
+            else if (where == TipoWhere.Menor) { retorno = "<"; }
+            else if (where == TipoWhere.MenorIgual) { retorno = "<="; }
+            else if (where == TipoWhere.Like) { retorno = "LIKE"; }
+            else if (where == TipoWhere.NotLike) { retorno = "NOT LIKE"; }
+            else { retorno = ""; }
+
+            return retorno;
+        }
     }
 
 }

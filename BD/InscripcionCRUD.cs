@@ -23,23 +23,23 @@ namespace BibliotecaClases.BD
             FechaInscripcion = fechaInscripcion;
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("EstudianteID", EstudianteId);
             AddSetValue("CursoID", CursoId);
             AddSetValue("EstadoDeInscripcion", EstadoDeInscripcion);
             AddSetValue("FechaInscripcion", FechaInscripcion);
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("EstudianteID", EstudianteId);
             AddWhereCondition("CursoID", CursoId);
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public new int Update()
+        public new async Task<int> Update()
         {
             AddWhereCondition("EstudianteID", EstudianteId);
             AddWhereCondition("CursoID", CursoId);
@@ -47,37 +47,50 @@ namespace BibliotecaClases.BD
             AddSetValue("EstadoDeInscripcion", EstadoDeInscripcion);
             AddSetValue("FechaInscripcion", FechaInscripcion);
 
-            return base.Update();
+            return await base.Update();
         }
 
-        public static List<Inscripcion> GetAll()
+        public static async Task<List<Inscripcion>> GetAll()
         {
             Inscripcion inscripcion = new Inscripcion();
-            return inscripcion.InternalGetAll(inscripcion.Map);
+            return await inscripcion.InternalGetAll(inscripcion.Map);
         }
 
-        public static List<Inscripcion> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<Inscripcion>> SearchWhere(Dictionary<string, object> campoValores)
         {
             Inscripcion inscripcion = new Inscripcion();
-            return inscripcion.InternalSearchWhere(inscripcion.Map, campoValores);
+            return await inscripcion.InternalSearchWhere(inscripcion.Map, campoValores);
         }
 
-        public static List<Inscripcion> GetInscripcionesDeCurso(string cursoId)
+        public static async Task<List<Inscripcion>> GetInscripcionesDeCurso(string cursoId)
         {
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("CursoID", cursoId);
-            return SearchWhere(where);
+            return await SearchWhere(where);
         }
 
-        public static Inscripcion? GetInscripcion(string cursoId, string estudianteID)
+        public static async Task<Inscripcion?> GetInscripcion(string cursoId, string estudianteID)
         {
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("CursoID", cursoId);
             where.Add("EstudianteID", estudianteID);
-            List<Inscripcion> listaInscripciones = SearchWhere(where);
+            List<Inscripcion> listaInscripciones = await SearchWhere(where);
             if (listaInscripciones.Count == 0) { return null; }
             else { return listaInscripciones[0]; }
             
+        }
+
+        public static async Task<List<Inscripcion>> GetInscripcionesPorFecha(DateTime fechaInicio, DateTime fechaFin)
+        {
+            List<Inscripcion> inscripciones = await Inscripcion.GetAll();
+
+            DateTime fInicio = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 0, 0, 0);
+            DateTime fFin = new DateTime(fechaFin.Year, fechaFin.Month, fechaFin.Day, 0, 0, 0);
+
+            inscripciones.RemoveAll(item => DateTime.Compare(item.FechaInscripcion, fInicio) < 0 );
+            inscripciones.RemoveAll(item => DateTime.Compare(item.FechaInscripcion, fFin) > 0);
+
+            return inscripciones;
         }
 
         public Inscripcion Map(IDataRecord reader)
@@ -85,8 +98,9 @@ namespace BibliotecaClases.BD
             var estudianteId = reader["EstudianteID"].ToString() ?? "";
             var cursoId = reader["CursoID"].ToString() ?? "";
             var estadoInscripcion = (EstadoDeInscripcion) reader.GetByte(reader.GetOrdinal("EstadoDeInscripcion"));
+            var fechaDeInscripcion = reader.GetDateTime(reader.GetOrdinal("FechaInscripcion"));
 
-            var inscripcion = new Inscripcion(estudianteId, cursoId, estadoInscripcion);
+            var inscripcion = new Inscripcion(estudianteId, cursoId, estadoInscripcion, fechaDeInscripcion);
 
             return inscripcion;
         }

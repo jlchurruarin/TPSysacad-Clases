@@ -20,31 +20,31 @@ namespace BibliotecaClases.BD
             CursoId = cursoId;
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("MateriaID", MateriaId);
             AddSetValue("CursoID", CursoId);
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("MateriaID", MateriaId);
             AddWhereCondition("CursoID", CursoId);
 
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public static List<MateriaCurso> GetAll()
+        public static async Task<List<MateriaCurso>> GetAll()
         {
             MateriaCurso mc = new MateriaCurso();
-            return mc.InternalGetAll(mc.Map);
+            return await mc.InternalGetAll(mc.Map);
         }
 
-        public static List<MateriaCurso> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<MateriaCurso>> SearchWhere(Dictionary<string, object> campoValores)
         {
             MateriaCurso mc = new MateriaCurso();
-            return mc.InternalSearchWhere(mc.Map, campoValores);
+            return await mc.InternalSearchWhere(mc.Map, campoValores);
         }
 
         public MateriaCurso Map(IDataRecord reader)

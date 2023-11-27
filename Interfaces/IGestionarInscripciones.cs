@@ -9,7 +9,7 @@ namespace BibliotecaClases.Interfaces
 {
     public interface IGestionarInscripciones
     {
-        public event Func<Curso, EstadoDeInscripcion?, List<Usuario>>? AlSolicitarEstudiantes;
+        public event Func<Curso, EstadoDeInscripcion?, Task<List<Usuario>>>? AlSolicitarEstudiantes;
 
         public void OnRemoveOK();
         public void OnRemoveError(string errorMessage);

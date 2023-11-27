@@ -10,12 +10,12 @@ namespace BibliotecaClases.BD
     public interface ICRUDOps<T> where T : class
     {
 
-        int Add();
-        int Delete();
-        int Update();
+        Task<int> Add();
+        Task<int> Delete();
+        Task<int> Update();
 
-        static List<T> GetAll() => throw new NotImplementedException();
-        static List<T> SearchWhere() => throw new NotImplementedException();
+        static async Task<List<T>> GetAll() => throw new NotImplementedException();
+        static async Task<List<T>> SearchWhere() => throw new NotImplementedException();
 
         static SqlDbType GetSqlDbType(string key) => throw new NotImplementedException();
 

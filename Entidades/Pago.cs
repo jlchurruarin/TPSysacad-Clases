@@ -9,22 +9,20 @@ namespace BibliotecaClases.BD
     public partial class Pago
     {
 
-        private Pago() : this(Sistema.GenerarUUID(), string.Empty, ConceptoPago.Matricula, EstadoPago.Pendiente, 0m)
+        private Pago() : this(Sistema.GenerarUUID(), string.Empty, ConceptoPago.Matricula, 0m, EstadoPago.Pendiente, null, null)
         {
 
         }
-        public Pago(Usuario estudiante, ConceptoPago conceptoPago,decimal monto) : this(estudiante.Id, conceptoPago, monto) { }
+        public Pago(Usuario estudiante, ConceptoPago conceptoPago, decimal monto) : this(estudiante.Id, conceptoPago, monto, EstadoPago.Pendiente, null, null) { }
 
-        public Pago(string estudianteId, ConceptoPago conceptoPago, decimal monto) : this() 
+        public Pago(string estudianteId, ConceptoPago conceptoPago, decimal monto, EstadoPago estadoPago, MetodoPago? metodoPago, DateTime? fechaPago) : this() 
         {
             EstudianteId = estudianteId;
             ConceptoDePago = conceptoPago;
             Monto = monto;
-        }
-
-        public Pago(string estudianteId, ConceptoPago conceptoPago, EstadoPago estadoPago, decimal monto) : this(estudianteId, conceptoPago, monto)
-        {
             EstadoDePago = estadoPago;
+            MetodoDePago = metodoPago;
+            FechaDePago = fechaPago;
         }
 
         public override string ToString()

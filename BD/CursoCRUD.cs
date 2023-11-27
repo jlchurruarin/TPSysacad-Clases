@@ -34,23 +34,23 @@ namespace BibliotecaClases.BD
             ProfesorId = profesorId;
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("CursoID", Id);
             AddSetValue("Nombre", Nombre);
             AddSetValue("Aula", Aula);
             AddSetValue("CupoMaximo", CupoMaximo);
             AddSetValue("ProfesorId", ProfesorId);
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("CursoID", Id);
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public new int Update()
+        public new async Task<int> Update()
         {
             AddSetValue("Nombre", Nombre);
             AddSetValue("Aula", Aula);
@@ -58,29 +58,29 @@ namespace BibliotecaClases.BD
             AddSetValue("ProfesorId", ProfesorId);
 
             AddWhereCondition("CursoID", Id);
-            return base.Update();
+            return await base.Update();
         }
 
-        public static List<Curso> GetAll()
+        public static async Task<List<Curso>> GetAll()
         {
             Curso curso = new Curso();
-            return curso.InternalGetAll(curso.Map);
+            return await curso.InternalGetAll(curso.Map);
         }
 
-        public static List<Curso> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<Curso>> SearchWhere(Dictionary<string, object> campoValores)
         {
             Curso curso = new Curso();
-            return curso.InternalSearchWhere(curso.Map, campoValores);
+            return await curso.InternalSearchWhere(curso.Map, campoValores);
         }
 
-        public static List<Curso> GetCursosInscripto(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosInscripto(Usuario usuario)
         {
             List<Curso> listaCursos = new List<Curso>();
-            List<Curso> listaCursosEnEspera = GetCursosEnEspera(usuario);
-            List<Curso> listaCursosEnCurso = GetCursosEnCurso(usuario);
-            List<Curso> listaCursosCursadaAprobada = GetCursosCursoAprobado(usuario);
-            List<Curso> listaCursosFinalAprobado = GetCursosFinalAprobado(usuario);
-            List<Curso> listaCursosLibre = GetCursosLibre(usuario);
+            List<Curso> listaCursosEnEspera = await GetCursosEnEspera(usuario);
+            List<Curso> listaCursosEnCurso = await GetCursosEnCurso(usuario);
+            List<Curso> listaCursosCursadaAprobada = await GetCursosCursoAprobado(usuario);
+            List<Curso> listaCursosFinalAprobado = await GetCursosFinalAprobado(usuario);
+            List<Curso> listaCursosLibre = await GetCursosLibre(usuario);
 
             listaCursos.AddRange(listaCursosEnEspera);
             listaCursos.AddRange(listaCursosEnCurso);
@@ -91,94 +91,94 @@ namespace BibliotecaClases.BD
             return listaCursos;
         }
 
-        private static List<Curso> GetCursosPorEstadoDeCursada(Usuario usuario, EstadoDeInscripcion estado)
+        private static async Task<List<Curso>> GetCursosPorEstadoDeCursada(Usuario usuario, EstadoDeInscripcion estado)
         {
             Curso curso = new Curso();
             curso.AddJoin("INNER JOIN", "Inscripciones", "CursoID", "CursoID");
             curso.AddWhereCondition("Inscripciones", "EstudianteID", usuario.Id);
             curso.AddWhereCondition("Inscripciones", "EstadoDeInscripcion", estado);
-            return curso.InternalSearchWhere(curso.Map, new Dictionary<string, object>());
+            return await curso.InternalSearchWhere(curso.Map, new Dictionary<string, object>());
         }
 
-        public static List<Curso> GetCursosEnEspera(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosEnEspera(Usuario usuario)
         {
-            return GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.EnListaDeEspera);
+            return await GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.EnListaDeEspera);
         }
 
-        public static List<Curso> GetCursosEnCurso(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosEnCurso(Usuario usuario)
         {
-            return GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.Cursando);
+            return await GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.Cursando);
         }
 
-        public static List<Curso> GetCursosCursoAprobado(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosCursoAprobado(Usuario usuario)
         {
-            return GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.CursadaAprobada);
+            return await GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.CursadaAprobada);
         }
 
-        public static List<Curso> GetCursosFinalAprobado(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosFinalAprobado(Usuario usuario)
         {
-            return GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.FinalAprobado);
+            return await GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.FinalAprobado);
         }
 
-        public static List<Curso> GetCursosLibre(Usuario usuario)
+        public static async Task<List<Curso>> GetCursosLibre(Usuario usuario)
         {
-            return GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.Libre);
+            return await GetCursosPorEstadoDeCursada(usuario, EstadoDeInscripcion.Libre);
         }
 
-        public static Curso? ObtenerCursoPorID(string id)
+        public static async Task<Curso?> ObtenerCursoPorID(string id)
         {
             Curso curso = new Curso();
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("CursoID", id);
-            List<Curso> cursos = curso.InternalSearchWhere(curso.Map, where);
+            List<Curso> cursos = await curso.InternalSearchWhere(curso.Map, where);
 
             if (cursos.Count == 0) return null;
 
             return cursos[0];
         }
 
-        public static List<Curso> ObtenerCursosPorIDMateria(string id)
+        public static async Task<List<Curso>> ObtenerCursosPorIDMateria(string id)
         {
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("MateriaID", id);
-            List<MateriaCurso> materiaCurso = MateriaCurso.SearchWhere(where);
+            List<MateriaCurso> materiaCurso = await MateriaCurso.SearchWhere(where);
 
             List<Curso> listaCursos = new List<Curso>();
 
             foreach(MateriaCurso mc in materiaCurso)
             {
-                Curso? curso = Curso.ObtenerCursoPorID(mc.CursoId);
+                Curso? curso = await ObtenerCursoPorID(mc.CursoId);
                 if (curso is not null) { listaCursos.Add(curso); }
             }
 
             return listaCursos;
         }
 
-        public static List<Curso> ObtenerCursosPorIDMateria(string[] id)
+        public static async Task<List<Curso>> ObtenerCursosPorIDMateria(string[] id)
         {
             List<Curso> listaCursos = new List<Curso>();
             foreach(string materiaId in id)
             {
-                List<Curso> lcursos = ObtenerCursosPorIDMateria(materiaId);
+                List<Curso> lcursos = await ObtenerCursosPorIDMateria(materiaId);
                 listaCursos.AddRange(lcursos);
             }
             return listaCursos;
         }
 
-        public List<Usuario> GetIncriptos()
+        public async Task<List<Usuario>> GetIncriptos()
         {
-            return Usuario.GetUsuariosInscriptos(this);
+            return await Usuario.GetUsuariosInscriptos(this);
         }
 
-        public int GetCantidadIncriptos()
+        public async Task<int> GetCantidadIncriptos()
         {
-            List<Usuario> listaInscriptos = Usuario.GetUsuariosInscriptos(this);
+            List<Usuario> listaInscriptos = await Usuario.GetUsuariosInscriptos(this);
             return listaInscriptos.Count;
         }
 
-        public List<HorarioCurso> GetAllHorarios()
+        public async Task<List<HorarioCurso>> GetAllHorarios()
         {
-            return HorarioCurso.GetHorarioCursos(this);
+            return await HorarioCurso.GetHorarioCursos(this);
         }
 
         public Curso Map(IDataRecord reader)

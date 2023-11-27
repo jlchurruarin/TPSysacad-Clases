@@ -17,7 +17,7 @@ namespace BibliotecaClases.Logica
             _gestionCursoVista.AlSolicitarCursos += ObtenerCursos;
         }
 
-        public void EliminarCurso(object curso, object estudiante)
+        public async Task EliminarCurso(object curso, object estudiante)
         {
             Curso? cursoSelecionado = curso as Curso;
             Usuario? estudianteSeleccionado = estudiante as Usuario;
@@ -29,7 +29,7 @@ namespace BibliotecaClases.Logica
                 Inscripcion inscripcion = new Inscripcion(estudianteSeleccionado.Id, cursoSelecionado.Id, EstadoDeInscripcion.Cursando);
 
                 try {
-                    inscripcion.Delete();
+                    await inscripcion.Delete();
                     _gestionCursoVista.OnRemoveOk();
                 }
                 catch (Exception ex)
@@ -39,19 +39,19 @@ namespace BibliotecaClases.Logica
             }
         }
 
-        public List<Curso> ObtenerCursos(Usuario estudiante)
+        public async Task<List<Curso>> ObtenerCursos(Usuario estudiante)
         {
 
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("EstudianteID", estudiante.Id);
 
-            List<Inscripcion> inscripciones = Inscripcion.SearchWhere(where);
+            List<Inscripcion> inscripciones = await Inscripcion.SearchWhere(where);
 
             List<Curso> cursos = new List<Curso>();
 
             foreach (Inscripcion i in inscripciones)
             {
-                Curso? c = Curso.ObtenerCursoPorID(i.CursoId);
+                Curso? c = await Curso.ObtenerCursoPorID(i.CursoId);
                 if (c is not null) { cursos.Add(c); }
             }
 

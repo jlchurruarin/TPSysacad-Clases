@@ -59,9 +59,9 @@ namespace BibliotecaClases
             return BCrypt.Net.BCrypt.EnhancedHashPassword(texto, 9);
         }
 
-        public static void ValidarLogin(ILoginVista loginVista, TipoDeUsuario tipoDeUsuario, string correo, string cotraseña)
+        public static async void ValidarLogin(ILoginVista loginVista, TipoDeUsuario tipoDeUsuario, string correo, string cotraseña)
         {
-            Usuario? usuario = Usuario.ObtenerUsuario(TipoDeUsuario.Administrador, correo, cotraseña);
+            Usuario? usuario = await Usuario.ObtenerUsuario(tipoDeUsuario, correo, cotraseña);
 
             if (usuario == null)
             {

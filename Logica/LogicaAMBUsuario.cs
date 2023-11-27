@@ -19,13 +19,13 @@ namespace BibliotecaClases.Logica
             _usuarioVista.AlSolicitarUsuario += MostrarUsuario;
         }
 
-        public void MostrarUsuario()
+        public async void MostrarUsuario()
         {
-            Usuario? usuario = Usuario.ObtenerUsuarioPorID(_usuarioVista.TipoDeUsuario, _usuarioVista.Usuario.Id);
+            Usuario? usuario = await Usuario.ObtenerUsuarioPorID(_usuarioVista.TipoDeUsuario, _usuarioVista.Usuario.Id);
             _usuarioVista.MostrarUsuario(usuario);
         }
 
-        public void AddUsuario(TipoDeUsuario tipoDeUsuario, string legajo, string nombre, string apellido,
+        public async void AddUsuario(TipoDeUsuario tipoDeUsuario, string legajo, string nombre, string apellido,
                         string correoElectronico, string contraseña, string dni,
                         bool cambioDeContraseñaObligatorio, string numeroDeTelefojo, string direccion)
         {
@@ -44,7 +44,7 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                usuario.Add();
+                await usuario.Add();
                 _usuarioVista.OnAddOk();
             }
             catch (Exception ex)
@@ -68,7 +68,7 @@ namespace BibliotecaClases.Logica
 
         }
 
-        public void UpdateUsuario(string id, TipoDeUsuario tipoDeUsuario, string legajo, string nombre, string apellido,
+        public async void UpdateUsuario(string id, TipoDeUsuario tipoDeUsuario, string legajo, string nombre, string apellido,
                         string correoElectronico, string contraseña, string dni,
                         bool cambioDeContraseñaObligatorio, string numeroDeTelefojo, string direccion)
         {
@@ -89,7 +89,7 @@ namespace BibliotecaClases.Logica
 
             try
             {
-                usuario.Update();
+                await usuario.Update();
             }
             catch (Exception ex)
             {

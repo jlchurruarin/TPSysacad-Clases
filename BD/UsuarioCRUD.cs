@@ -48,7 +48,7 @@ namespace BibliotecaClases.BD
             Direccion = direccion;
         }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
 
             //Microsoft.Data.SqlClient.SqlException a validar
@@ -64,17 +64,17 @@ namespace BibliotecaClases.BD
             AddSetValue("NumeroDeTelefono", NumeroDeTelefono);
             AddSetValue("Direccion", Direccion);
 
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("UsuarioId", Id);
             AddWhereCondition("TipoUsuario", TipoDeUsuario);
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public new int Update()
+        public new async Task<int> Update()
         {
             AddSetValue("TipoUsuario", TipoDeUsuario);
             AddSetValue("Legajo", Legajo);
@@ -89,36 +89,36 @@ namespace BibliotecaClases.BD
 
             AddWhereCondition("UsuarioId", Id);
 
-            return base.Update();
+            return await base.Update();
         }
 
-        public static List<Usuario> GetAll()
+        public static async Task<List<Usuario>> GetAll()
         {
             Usuario usuario = new Usuario();
-            return usuario.InternalGetAll(usuario.Map);
+            return await usuario.InternalGetAll(usuario.Map);
         }
 
-        public static List<Usuario> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<Usuario>> SearchWhere(Dictionary<string, object> campoValores)
         {
             Usuario usuario = new Usuario();
-            return usuario.InternalSearchWhere(usuario.Map, campoValores);
+            return await usuario.InternalSearchWhere(usuario.Map, campoValores);
         }
 
-        public static List<Usuario> GetAll(TipoDeUsuario tipoDeUsuario)
+        public static async Task<List<Usuario>> GetAll(TipoDeUsuario tipoDeUsuario)
         {
             Usuario usuario = new Usuario();
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("TipoUsuario", tipoDeUsuario);
-            return usuario.InternalSearchWhere(usuario.Map, where);
+            return await usuario.InternalSearchWhere(usuario.Map, where);
         }
 
-        public static Usuario? ObtenerUsuario(TipoDeUsuario tipoDeUsuario, string correo, string contraseña)
+        public static async Task<Usuario?> ObtenerUsuario(TipoDeUsuario tipoDeUsuario, string correo, string contraseña)
         {
             Usuario usuario = new Usuario();
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("TipoUsuario", tipoDeUsuario);
             where.Add("CorreoElectronico", correo.ToLower());
-            List<Usuario> usuarios = usuario.InternalSearchWhere(usuario.Map, where);
+            List<Usuario> usuarios = await usuario.InternalSearchWhere(usuario.Map, where);
 
             if (usuarios.Count == 0) { return null; }
 
@@ -126,7 +126,7 @@ namespace BibliotecaClases.BD
             else { return null; }
         }
 
-        public static Usuario? ObtenerUsuarioPorID(TipoDeUsuario tipoDeUsuario, string? usuarioID)
+        public static async Task<Usuario?> ObtenerUsuarioPorID(TipoDeUsuario tipoDeUsuario, string? usuarioID)
         {
             if (usuarioID is null) { return null; }
 
@@ -134,32 +134,32 @@ namespace BibliotecaClases.BD
             Dictionary<string, object> where = new Dictionary<string, object>();
             where.Add("TipoUsuario", tipoDeUsuario);
             where.Add("UsuarioID", usuarioID);
-            List<Usuario> usuarios = usuario.InternalSearchWhere(usuario.Map, where);
+            List<Usuario> usuarios = await usuario.InternalSearchWhere(usuario.Map, where);
 
             if (usuarios.Count == 0) { return null; }
 
             return usuarios[0];
         }
 
-        public static List<Usuario> GetUsuariosInscriptos(Curso curso)
+        public static async Task<List<Usuario>> GetUsuariosInscriptos(Curso curso)
         {
-            List<Usuario> listaCursando = GetUsuarioPorEstadoDeInscripcion(curso, EstadoDeInscripcion.Cursando);
+            List<Usuario> listaCursando = await GetUsuarioPorEstadoDeInscripcion(curso, EstadoDeInscripcion.Cursando);
             return listaCursando;
         }
 
-        private static List<Usuario> GetUsuarioPorEstadoDeInscripcion(Curso curso, EstadoDeInscripcion estadoDeInscripcion)
+        private static async Task<List<Usuario>> GetUsuarioPorEstadoDeInscripcion(Curso curso, EstadoDeInscripcion estadoDeInscripcion)
         {
             Usuario usuario = new Usuario();
             usuario.AddJoin("INNER JOIN", "Inscripciones", "EstudianteID", "UsuarioID");
             usuario.AddWhereCondition("Inscripciones", "CursoID", curso.Id);
             usuario.AddWhereCondition("Inscripciones", "EstadoDeInscripcion", (int) estadoDeInscripcion);
-            return usuario.InternalSearchWhere(usuario.Map, new Dictionary<string, object>());
+            return await usuario.InternalSearchWhere(usuario.Map, new Dictionary<string, object>());
         }
 
-        public int GetCreditosObtenidos()
+        public async Task<int> GetCreditosObtenidos()
         {
-            List<Curso> cursadasAprobados = Curso.GetCursosCursoAprobado(this);
-            List<Curso> finalesAprobados = Curso.GetCursosFinalAprobado(this);
+            List<Curso> cursadasAprobados = await Curso.GetCursosCursoAprobado(this);
+            List<Curso> finalesAprobados = await Curso.GetCursosFinalAprobado(this);
 
             List<Curso> listaCursosCreditos = new List<Curso>();
             listaCursosCreditos.AddRange(cursadasAprobados);
@@ -169,7 +169,7 @@ namespace BibliotecaClases.BD
 
             foreach (Curso c in listaCursosCreditos)
             {
-                Materia? m = Materia.ObtenerMateriaPorCursoID(c.Id);
+                Materia? m = await Materia.ObtenerMateriaPorCursoID(c.Id);
                 if (m is not null) { creditosTotales += m.CreditosBrindados; }
             }
 

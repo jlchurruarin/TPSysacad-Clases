@@ -18,9 +18,9 @@ namespace BibliotecaClases.Logica
             _gestionDeInscripcioneVista.AlSolicitarEstudiantes += ObtenerUsuariosPorInscripcion;
         }
 
-        public List<Usuario> ObtenerUsuariosPorInscripcion(Curso curso, EstadoDeInscripcion? estadoDeInscripcion)
+        public async Task<List<Usuario>> ObtenerUsuariosPorInscripcion(Curso curso, EstadoDeInscripcion? estadoDeInscripcion)
         {
-            List<Inscripcion> inscripciones = Inscripcion.GetInscripcionesDeCurso(curso.Id);
+            List<Inscripcion> inscripciones = await Inscripcion.GetInscripcionesDeCurso(curso.Id);
 
             if (estadoDeInscripcion != null)
             {
@@ -33,7 +33,7 @@ namespace BibliotecaClases.Logica
 
             foreach (Inscripcion i in inscripciones)
             {
-                Usuario estudiante = Usuario.ObtenerUsuarioPorID(TipoDeUsuario.Estudiante, i.EstudianteId);
+                Usuario estudiante = await Usuario.ObtenerUsuarioPorID(TipoDeUsuario.Estudiante, i.EstudianteId);
 
                 if (estudiante is not null) { estudiantesInscriptos.Add(estudiante); }
             }
@@ -41,12 +41,12 @@ namespace BibliotecaClases.Logica
             return estudiantesInscriptos;
         }
 
-        public void EliminarInscripcion(Usuario estudiante, Curso curso)
+        public async void EliminarInscripcion(Usuario estudiante, Curso curso)
         {
             try
             {
                 Inscripcion inscripcion = new Inscripcion(estudiante.Id, curso.Id, EstadoDeInscripcion.Cursando);
-                inscripcion.Delete();
+                await inscripcion.Delete();
                 _gestionDeInscripcioneVista.OnRemoveOK();
             } catch (Exception ex)
             {

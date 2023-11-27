@@ -26,31 +26,31 @@ namespace BibliotecaClases.BD
 
         public RequisitoMateria(string materiaId, Materia materiaRequerida) : this(materiaId, materiaRequerida.Id) { }
 
-        public new int Add()
+        public new async Task<int> Add()
         {
             AddSetValue("MateriaID", MateriaId);
             AddSetValue("MateriaRequeridaID", MateriaRequeridaId);
-            return base.Add();
+            return await base.Add();
         }
 
-        public new int Delete()
+        public new async Task<int> Delete()
         {
             AddWhereCondition("MateriaID", MateriaId);
             AddWhereCondition("MateriaRequeridaID", MateriaRequeridaId);
 
-            return base.Delete();
+            return await base.Delete();
         }
 
-        public static List<RequisitoMateria> GetAll()
+        public static async Task<List<RequisitoMateria>> GetAll()
         {
             RequisitoMateria rm = new RequisitoMateria();
-            return rm.InternalGetAll(rm.Map);
+            return await rm.InternalGetAll(rm.Map);
         }
 
-        public static List<RequisitoMateria> SearchWhere(Dictionary<string, object> campoValores)
+        public static async Task<List<RequisitoMateria>> SearchWhere(Dictionary<string, object> campoValores)
         {
             RequisitoMateria rm = new RequisitoMateria();
-            return rm.InternalSearchWhere(rm.Map, campoValores);
+            return await rm.InternalSearchWhere(rm.Map, campoValores);
         }
 
         public RequisitoMateria Map(IDataRecord reader)

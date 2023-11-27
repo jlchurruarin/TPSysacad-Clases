@@ -10,7 +10,7 @@ namespace BibliotecaClases.Interfaces
     public interface IRecibidorDeItemSeleccionado<T> where T : class
     {
 
-        public List<T> ItemsAMostrar();
+        public Task<List<T>> ItemsAMostrar();
 
         public void RecibirItemSeleccionada(object item);
 

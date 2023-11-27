@@ -9,7 +9,7 @@ namespace BibliotecaClases.Interfaces
 {
     public interface IGestionMateriasRequeridas : ISQLAddUpdateVista
     {
-        public event Func<Materia, List<Materia>>? AlSolicitarMateria;
+        public event Func<Materia, Task<List<Materia>>>? AlSolicitarMateria;
 
         public void MostrarListaMaterias(List<Materia> listaMaterias);
         public void OnRemoveOk();
